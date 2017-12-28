@@ -3,8 +3,9 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
-class Config:
+class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
+    # 每次请求结束后，自动提交数据库中的变动
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
     # NICEBLOG_ADMIN = os.environ.get('NICEBLOG_ADMIN')
@@ -18,18 +19,20 @@ class Config:
         pass
 
 
-# 针对开发环境的配置
+# 开发环境的配置
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@localhost:3306/niceblog_dev'
+    # 数据库URI
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@127.0.0.1:3306/niceblog_dev'
 
 
-# 针对测试环境的配置
+# 测试环境的配置
 class TestingConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@localhost:3306/niceblog_test'
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'niceblog_test.sqlite')
 
 
-# 针对生产环境的配置
+# 生产环境的配置
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@localhost:3306/niceblog'
 
