@@ -1,6 +1,6 @@
 # app.route()装饰器把修饰的视图函数注册为路由
 from flask import render_template, redirect, request, url_for, flash
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required
 
 from app.auth import auth
 from app.auth.forms import LoginForm
@@ -23,3 +23,12 @@ def login():
             return redirect(request.args.get('next') or url_for('main.index'))
         flash('用户名或密码错误')
     return render_template('auth/login.html', form=form)
+
+
+@auth.route('/logout')
+@login_required
+def logout():
+    # 删除并重置用户会话
+    logout_user()
+    flash('您已经退出登录！')
+    return redirect('main.index')
