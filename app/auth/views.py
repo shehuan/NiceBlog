@@ -1,9 +1,11 @@
 # app.route()装饰器把修饰的视图函数注册为路由
 from flask import render_template, redirect, request, url_for, flash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
+from app import db
 from app.auth import auth
-from app.auth.forms import LoginForm
+from app.auth.forms import LoginForm, RegistrationForm
+from app.email import send_email
 from app.models import User
 
 
@@ -20,6 +22,7 @@ def login():
             # 此处的重定向有两种
             # 1.访问未授权的URL会显示登录页面，flask_login会把原地址保存在next参数中，登录成功后转到原地址
             # 2.next参数不存在，则转到首页
+            # url_for：获取视图函数的URL
             return redirect(request.args.get('next') or url_for('main.index'))
         flash('用户名或密码错误')
     return render_template('auth/login.html', form=form)
@@ -30,5 +33,33 @@ def login():
 def logout():
     # 删除并重置用户会话
     logout_user()
-    flash('您已经退出登录！')
-    return redirect('main.index')
+    flash('您已经退出登录')
+    return redirect(url_for('main.index'))
+
+
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data, username=form.username.data, password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        # 发送确认邮件
+        send_email(user.email, '账号信息确认', 'auth/email/confirm', user=user, token=token)
+        flash("已发送信息确认邮件，请注意查收")
+        return redirect(url_for('auth.login'))
+    return render_template('auth/register.html', form=form)
+
+
+@auth.route('/confirm/<token>')
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
+    if current_user.confirm(token):
+        db.session.commit()
+        flash('账号信息确认成功')
+    else:
+        flash('账号信息确认失败，链接无效')
+    return redirect(url_for('main.index'))

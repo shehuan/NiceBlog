@@ -9,10 +9,16 @@ class Config(object):
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
     # NICEBLOG_ADMIN = os.environ.get('NICEBLOG_ADMIN')
-    # # 发件人
-    # NICEBLOG_MAIL_SENDER = 'NiceBlog Admin <othershe.dev.gmail,com>'
-    # # 邮件主题前缀
-    # NICEBLOG_MAIL_SUBJECT_PREFIX = '[NiceBlog]'
+    MAIL_USE_SSL = True
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = '544642279@qq.com'
+    MAIL_PASSWORD = 'shh82879249huan'
+    MAIL_SERVER = 'smtp.qq.com'
+    MAIL_PORT = 25
+    # 发件人
+    NICEBLOG_MAIL_SENDER = 'NiceBlog<544642279@qq.com>'
+    # 邮件主题前缀
+    NICEBLOG_MAIL_SUBJECT_PREFIX = '[NiceBlog]'
 
     @staticmethod
     def init_app(app):
