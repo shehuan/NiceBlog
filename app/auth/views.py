@@ -4,13 +4,16 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from app import db
 from app.auth import auth
-from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.forms import LoginForm, RegistrationForm, ChangePasswordForm
 from app.email import send_email
 from app.models import User
 
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        flash('您已经登录')
+        return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -99,6 +102,31 @@ def before_request():
 
 @auth.route('/unconfirmed')
 def unconfirmed():
+    """
+    未进行邮件验证，登录后的视图函数
+    """
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
     return render_template('auth/unconfirmed.html')
+
+
+@auth.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    """
+    修改密码
+    :return:
+    """
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if form.new_password.data == form.old_password.data:
+            flash('新密码不能和原始密码相同')
+        elif current_user.verify_password(form.old_password.data):
+            current_user.password = form.new_password.data
+            db.session.add(current_user)
+            db.session.commit()
+            flash('密码修改成功')
+            return redirect(url_for('main.index'))
+        else:
+            flash('原始密码错误')
+    return render_template('auth/change_password.html', form=form)
