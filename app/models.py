@@ -19,7 +19,7 @@ class User(UserMixin, db.Model):
 
     @property
     def password(self):
-        raise AttributeError('password is not a readable attribute')
+        raise AttributeError('password属性不可读')
 
     # 计算密码的散列值
     @password.setter

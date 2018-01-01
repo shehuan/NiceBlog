@@ -1,4 +1,4 @@
-Hello {{ user.username }},
+您好，{{ user.username }}
 
 欢迎注册 NiceBlog！
 

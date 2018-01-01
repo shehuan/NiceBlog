@@ -18,6 +18,8 @@ login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 # 设置登录页面的端点，
 login_manager.login_view = 'auth.login'
+# 设置快闪消息，使用@login_required装饰器的路由要用到
+login_manager.login_message = '该操作需要先登录账号'
 
 """
 运行时完成程序的创建

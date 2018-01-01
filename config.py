@@ -12,9 +12,9 @@ class Config(object):
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
     MAIL_USERNAME = '544642279@qq.com'
-    MAIL_PASSWORD = 'shh82879249huan'
+    MAIL_PASSWORD = 'ssmcaabftlzwbdhf'
     MAIL_SERVER = 'smtp.qq.com'
-    MAIL_PORT = 25
+    MAIL_PORT = 465
     # 发件人
     NICEBLOG_MAIL_SENDER = 'NiceBlog<544642279@qq.com>'
     # 邮件主题前缀
