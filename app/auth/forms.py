@@ -47,3 +47,21 @@ class ChangePasswordForm(FlaskForm):
     new_password2 = PasswordField('确认新密码', validators=[DataRequired(), Length(6, 16, message='密码长度为6到16位'),
                                                        EqualTo('new_password', '两次输入的新密码不一致')])
     submit = SubmitField("修改密码")
+
+
+class ResetPasswordRequestForm(FlaskForm):
+    """
+    重置密码：填写邮箱表单
+    """
+    email = StringField('邮箱', validators=[DataRequired(), Length(1, 64), Email(message='邮箱格式错误')])
+    submit = SubmitField("确定")
+
+
+class ResetPasswordForm(FlaskForm):
+    """
+    重置密码：设置新密码表单
+    """
+    password = PasswordField('新密码', validators=[DataRequired(), Length(6, 16, message='密码长度为6到16位')])
+    password2 = PasswordField('确认新密码', validators=[DataRequired(), Length(6, 16, message='密码长度为6到16位'),
+                                                   EqualTo('password', '两次输入的密码不一致')])
+    submit = SubmitField('确定')

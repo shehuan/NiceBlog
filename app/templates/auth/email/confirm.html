@@ -1,7 +1,7 @@
 <p>您好，{{ user.username }}</p>
 <p>欢迎注册 <b>NiceBlog</b>！</p>
 {#_external=True使程序生成完整的URL#}
-<p>你可以<a href="{{ url_for('auth.confirm', token=token, _external=True) }}">点我完成账号信息确认</a></p>
+<p>您可以<a href="{{ url_for('auth.confirm', token=token, _external=True) }}">点我完成账号信息确认</a></p>
 <p>或者在浏览器打开如下地址，完成操作</p>
 <p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
 <p>
