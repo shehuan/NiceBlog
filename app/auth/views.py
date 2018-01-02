@@ -9,6 +9,21 @@ from app.email import send_email
 from app.models import User
 
 
+@auth.before_app_request
+def before_request():
+    """
+    过滤未进行邮件确认的账户，会在请求之前调用
+    :return:
+    """
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed \
+                and request.endpoint \
+                and request.blueprint != 'auth' \
+                and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -84,20 +99,6 @@ def resend_confirmation():
     send_email(current_user.email, '账号信息确认', 'auth/email/confirm', user=current_user, token=token)
     flash('邮件已发送，请注意查收')
     return redirect(url_for('main.index'))
-
-
-@auth.before_app_request
-def before_request():
-    """
-    过滤未进行邮件确认的账户
-    :return:
-    """
-    if current_user.is_authenticated \
-            and not current_user.confirmed \
-            and request.endpoint \
-            and request.blueprint != 'auth' \
-            and request.endpoint != 'static':
-        return redirect(url_for('auth.unconfirmed'))
 
 
 @auth.route('/unconfirmed')

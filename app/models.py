@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import current_app
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -35,6 +37,12 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     # 外键，值为roles表中对应行的id
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    location = db.Column(db.String(64))
+    about_me = db.Column(db.Text)
+    # 注册日期，default参数可以用函数作为参数，需要生成默认值时，会调用对应函数
+    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    # 最后访问日期
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -118,6 +126,14 @@ class User(UserMixin, db.Model):
         :return:
         """
         return self.can(Permission.ADMIN)
+
+    def ping(self):
+        """
+        更新最后访问日期
+        :return:
+        """
+        self.last_seen = datetime.utcnow()
+        db.session.add(self)
 
 
 class Role(db.Model):
