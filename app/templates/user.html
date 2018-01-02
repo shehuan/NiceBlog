@@ -3,10 +3,13 @@
 
 {% block page_title %}个人信息{% endblock %}
 {% block page_content %}
-<div class="page-header">
-    <h3>昵称：{{ user.username }}</h3>
-    <h3>注册邮箱：{{ user.email }}</h3>
-    <h3>注册时间：{{ moment(user.member_since).format('YYYY-MM-DD HH:mm:ss') }}</h3>
-    <h3>最后登录时间：{{ moment(user.last_seen).format('YYYY-MM-DD HH:mm:ss') }}</h3>
-</div>
+    <div class="page-header">
+        <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=200) }}">
+        <div class="profile-header">
+            <h1>{{ user.username }}</h1>
+            <h5><strong>注册邮箱：</strong>{{ user.email }}</h5>
+            <h5><strong>注册时间：</strong>{{ moment(user.member_since).format('YYYY-MM-DD HH:mm:ss') }}</h5>
+            <h5><strong>最后登录时间：</strong>{{ moment(user.last_seen).format('YYYY-MM-DD HH:mm:ss') }}</h5>
+        </div>
+    </div>
 {% endblock %}

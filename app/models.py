@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime
 
 from flask import current_app
@@ -43,6 +44,8 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     # 最后访问日期
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    # 邮箱地址的md5值
+    avatar_hash = db.Column(db.String(32))
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -52,6 +55,8 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(name='Administrator').first()
             else:
                 self.role = Role.query.filter_by(default=True).first()
+        if self.email is not None and self.avatar_hash is None:
+            self.avatar_hash = self.gravatar_hash()
 
     @property
     def password(self):
@@ -134,6 +139,22 @@ class User(UserMixin, db.Model):
         """
         self.last_seen = datetime.utcnow()
         db.session.add(self)
+
+    def gravatar_hash(self):
+        return hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+
+    def gravatar(self, size=100, default='identicon', rating='g'):
+        """
+        生成用户头像地址
+        :param size:图片大小
+        :param default:指定图片生成器
+        :param rating:图片级别
+        :return:
+        """
+        url = 'https://secure.gravatar.com/avatar'
+        hash = self.avatar_hash or self.gravatar_hash()
+        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(url=url, hash=hash, size=size, default=default,
+                                                                     rating=rating)
 
 
 class Role(db.Model):
