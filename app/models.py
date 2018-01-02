@@ -1,12 +1,29 @@
 from flask import current_app
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db, login_manager
 
 
+class Permission:
+    """
+    权限常量类
+    """
+    # 喜欢/收藏
+    COLLECT = 1
+    # 评论
+    COMMIT = 2
+    # 写文章
+    WRITE = 4
+    # 管理员
+    ADMIN = 16
+
+
 class User(UserMixin, db.Model):
+    """
+    用户数据Model
+    """
     # 表名
     __tablename__ = 'users'
 
@@ -16,6 +33,17 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
+    # 外键，值为roles表中对应行的id
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.role is None:
+            # 如果是管理员账号，则赋予该user管理员角色
+            if self.email == current_app.config['NICEBLOG_ADMIN']:
+                self.role = Role.query.filter_by(name='Administrator').first()
+            else:
+                self.role = Role.query.filter_by(default=True).first()
 
     @property
     def password(self):
@@ -58,6 +86,12 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def reset_password(token, new_password):
+        """
+        重置密码
+        :param token:
+        :param new_password:
+        :return:
+        """
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token.encode('utf-8'))
@@ -69,6 +103,95 @@ class User(UserMixin, db.Model):
         user.password = new_password
         db.session.add(user)
         return True
+
+    def can(self, permission):
+        """
+        权限检查
+        :param permission:
+        :return:
+        """
+        return self.role is not None and self.role.has_permission(permission)
+
+    def is_administrator(self):
+        """
+        是否是管理员
+        :return:
+        """
+        return self.can(Permission.ADMIN)
+
+
+class Role(db.Model):
+    """
+    角色数据Model
+    """
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean(), default=False, index=True)
+    permissions = db.Column(db.Integer)
+    # 与当前角色相关联的用户组成的列表
+    # 'User'：当前Model关联的另一个Model
+    # backref='role'：定义反向关系
+    # lazy='dynamic'：不直接加载查询记录，但提供对应的查询功能
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
+    def __init__(self, **kwargs):
+        super(Role, self).__init__(**kwargs)
+        if self.permissions is None:
+            self.permissions = 0
+
+    @staticmethod
+    def inset_roles():
+        # 定义角色对应的权限dict
+        roles = {
+            'User': [Permission.COLLECT, Permission.COMMIT],
+            'Administrator': [Permission.COLLECT, Permission.COMMIT,
+                              Permission.WRITE, Permission.ADMIN]
+        }
+        default_role = 'User'
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            # roles表中没有对应角色，则创建
+            if role is None:
+                role = Role(name=r)
+            # 重置权限
+            role.reset_permissions()
+            # 添加对应角色的权限
+            for permission in roles[r]:
+                role.add_permission(permission)
+            # 如果角色名是User，则default为True
+            role.default = (role.name == default_role)
+            db.session.add(role)
+        db.session.commit()
+
+    def add_permission(self, permission):
+        if not self.has_permission(permission):
+            self.permissions += permission
+
+    def remove_permission(self, permission):
+        if self.has_permission(permission):
+            self.permissions -= permission
+
+    def reset_permissions(self):
+        self.permissions = 0
+
+    def has_permission(self, permission):
+        return self.permissions & permission == permission
+
+
+class AnonymousUser(AnonymousUserMixin):
+    """
+    未登录的用户类
+    """
+
+    def can(self, permission):
+        return False
+
+    def is_administrator(self):
+        return False
+
+
+login_manager.anonymous_user = AnonymousUser
 
 
 # Flask-Login的回调函数，用来加载用户信息

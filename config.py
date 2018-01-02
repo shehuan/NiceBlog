@@ -7,8 +7,9 @@ class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     # 每次请求结束后，自动提交数据库中的变动
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    # 管理员邮箱
+    NICEBLOG_ADMIN = 'shehuan320@163.com'
 
-    # NICEBLOG_ADMIN = os.environ.get('NICEBLOG_ADMIN')
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
     MAIL_USERNAME = '544642279@qq.com'
@@ -40,7 +41,7 @@ class TestingConfig(Config):
 
 # 生产环境的配置
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@localhost:3306/niceblog'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@127.0.0.1:3306/niceblog'
 
 
 config = {
