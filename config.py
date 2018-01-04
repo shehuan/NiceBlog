@@ -10,6 +10,9 @@ class Config(object):
     # 管理员邮箱
     NICEBLOG_ADMIN = 'shehuan320@163.com'
 
+    # 每页显示多少条博客
+    BLOGS_PER_PAGE = 10
+
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
     MAIL_USERNAME = '544642279@qq.com'

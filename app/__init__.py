@@ -3,6 +3,7 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_moment import Moment
+from flask_pagedown import PageDown
 from flask_sqlalchemy import SQLAlchemy
 
 from config import config
@@ -20,6 +21,9 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 # 设置快闪消息，使用@login_required装饰器的路由要用到
 login_manager.login_message = '该操作需要先登录账号'
+
+# 客户端实现MarkDown到Html的转换
+pagedown = PageDown()
 
 """
 运行时完成程序的创建
@@ -51,6 +55,7 @@ def create_app(config_name):
     moment.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
+    pagedown.init_app(app)
 
     # 注册main蓝本
     from app.main import main as main_blueprint

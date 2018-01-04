@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
 
 {% block title %}NiceBlog{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
+{% for blog in blogs %}
+<div class="post-content">
+    <h2 class="blog-title"><a>{{ blog.title }}</a></h2>
+    <div class="blog-body">{{ blog.body }}</div>
+    <div class="blog-date">{{ moment(blog.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
 </div>
+<hr>
+{% endfor %}
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, 'main.index') }}
+</div>
+{% endif %}
 {% endblock %}

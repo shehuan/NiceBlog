@@ -1,9 +1,12 @@
 import hashlib
 from datetime import datetime
 
-from flask import current_app
+import bleach
+from faker import Faker
+from flask import current_app, request
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db, login_manager
@@ -17,7 +20,7 @@ class Permission:
     COLLECT = 1
     # 评论
     COMMIT = 2
-    # 写文章
+    # 写博客
     WRITE = 4
     # 管理员
     ADMIN = 16
@@ -46,6 +49,7 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     # 邮箱地址的md5值
     avatar_hash = db.Column(db.String(32))
+    blogs = db.relationship('Blog', backref='author', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -151,7 +155,10 @@ class User(UserMixin, db.Model):
         :param rating:图片级别
         :return:
         """
-        url = 'https://secure.gravatar.com/avatar'
+        if request.is_secure:
+            url = 'https://secure.gravatar.com/avatar'
+        else:
+            url = 'http://www.gravatar.com/avatar'
         hash = self.avatar_hash or self.gravatar_hash()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(url=url, hash=hash, size=size, default=default,
                                                                      rating=rating)
@@ -168,7 +175,7 @@ class Role(db.Model):
     permissions = db.Column(db.Integer)
     # 与当前角色相关联的用户组成的列表
     # 'User'：当前Model关联的另一个Model
-    # backref='role'：定义反向关系
+    # backref='role'：给User添加一个role属性，定义反向关系
     # lazy='dynamic'：不直接加载查询记录，但提供对应的查询功能
     users = db.relationship('User', backref='role', lazy='dynamic')
 
@@ -235,3 +242,46 @@ login_manager.anonymous_user = AnonymousUser
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+
+class Blog(db.Model):
+    """
+    博客数据Model
+    """
+    __tablename__ = 'blogs'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128))
+    content = db.Column(db.Text)
+    content_html = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    # 外键，和User表对应
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    @staticmethod
+    def on_change_content(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'p']
+        # linkify()：把纯文本的URL转换成<a>链接
+        target.content_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, strip=True))
+
+    @staticmethod
+    def fake_blogs(count=50):
+        """
+        生成测试数据
+        :param count:
+        :return:
+        """
+        fake = Faker()
+        u = User.query.filter_by(role_id=2).first()
+        for i in range(count):
+            blog = Blog(title=fake.text()[0:20], body=fake.text(), timestamp=fake.past_date(), author=u)
+            db.session.add(blog)
+        db.session.commit()
+
+
+# 把on_change_content函数注册在content字段上，当content改变时，会执行on_change_content，
+# 进而content_html会更新
+db.event.listen(Blog.content, 'set', Blog.on_change_content)

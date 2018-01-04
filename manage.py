@@ -5,7 +5,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
 
 from app import create_app, db
-from app.models import User, Role, Permission
+from app.models import User, Role, Permission, Blog
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -14,11 +14,11 @@ migrate = Migrate(app, db)
 
 # 注册程序、数据库实例、数据模型，这些对象可直接导入shell
 def make_shell_context():
-    return dict(app=app, db=db, User=User, Role=Role, Permission=Permission)
+    return dict(app=app, db=db, User=User, Role=Role, Blog=Blog, Permission=Permission)
 
 
 # 集成shell
-# python manage.py shell
+# python manage.py {shell, db, test, runserver}
 manager.add_command('shell', Shell(make_context=make_shell_context))
 # 集成数据库迁移，步骤1执行一次即可，需要修改数据模型后需要迁移执行2、3步骤即可
 # 1.创建迁移仓库：python manage.py db init
