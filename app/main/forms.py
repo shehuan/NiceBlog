@@ -9,8 +9,9 @@ class NameForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class WriteBlogForm(FlaskForm):
-    """写博客表单"""
+class BlogForm(FlaskForm):
+    """创建/编辑博客表单"""
     title = StringField('标题', validators=[DataRequired(), Length(1, 128)])
-    body = PageDownField('博客内容', validators=[DataRequired()])
-    submit = SubmitField('发布博客')
+    content = PageDownField('文章内容', validators=[DataRequired()])
+    submit = SubmitField('发布')
+    save = SubmitField('保存')

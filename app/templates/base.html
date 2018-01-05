@@ -6,10 +6,11 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
+<nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -38,7 +39,7 @@
                     </ul>
                 </li>
                 {% if current_user.is_administrator() %}
-                <li><a href="{{  url_for('main.write_blog')  }}">写文章</a></li>
+                <li><a href="{{  url_for('main.create_blog')  }}">写文章</a></li>
                 {% endif %}
                 {% else %}
                 <li><a href="{{ url_for('auth.login') }}">登录</a></li>
@@ -46,7 +47,7 @@
             </ul>
         </div>
     </div>
-</div>
+</nav>
 {% endblock %}
 
 {% block content %}

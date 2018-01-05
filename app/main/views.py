@@ -3,7 +3,7 @@ from flask_login import current_user
 
 from app import db
 from app.main import main
-from app.main.forms import WriteBlogForm
+from app.main.forms import BlogForm
 from app.models import User, Blog
 
 
@@ -26,12 +26,31 @@ def user(username):
     return render_template('user.html', user=user)
 
 
-@main.route('/write', methods=['GET', 'POST'])
-def write_blog():
-    form = WriteBlogForm()
+@main.route('/create-blog', methods=['GET', 'POST'])
+def create_blog():
+    form = BlogForm()
     if form.validate_on_submit():
-        blog = Blog(title=form.title.data, body=form.body.data, author=current_user._get_current_object())
+        blog = Blog(title=form.title.data, content=form.content.data, author=current_user._get_current_object())
         db.session.add(blog)
         db.session.commit()
         return redirect(url_for('main.index'))
-    return render_template('write_blog.html', form=form)
+    return render_template('create_blog.html', form=form, type='create')
+
+
+@main.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
+def edit_blog(id):
+    blog = Blog.query.get_or_404(id)
+    form = BlogForm()
+    if form.validate_on_submit():
+        blog.title = form.title.data
+        blog.content = form.content.data
+        return redirect(url_for('main.blog', id=id))
+    form.title.data = blog.title
+    form.content.data = blog.content
+    return render_template('create_blog.html', form=form, type='edit')
+
+
+@main.route('/blog/<int:id>')
+def blog(id):
+    blog = Blog.query.get_or_404(id)
+    return render_template('blog.html', blog=blog)

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_title %}{% if type == 'create' %}写文章{% elif type == 'edit' %}编辑文章{% endif %}{% endblock %}
+{% block page_content %}
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {{ form.title.label }} {{ form.title(class="form-control") }}
+            <br>
+            {{ form.content.label }}{{ form.content(class="form-control", rows="16") }}
+            <br>
+            {{ form.submit(class="btn btn-default") }}
+        </form>
+    </div>
+    <div class="col-md-6">
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}

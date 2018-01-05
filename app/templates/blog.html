@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+{% block page_content %}
+<div class="page-content">
+    {% if current_user.is_administrator() %}<a href="{{ url_for('main.edit_blog', id=blog.id) }}">编辑</a>{% endif %}
+    <h2>{{ blog.title }}</h2>
+    <p>
+        {% if blog.content_html %}
+        {{ blog.content_html | safe }}
+        {% else %}
+        {{ blog.content }}
+        {% endif %}
+    </p>
+</div>
+{% endblock %}
+
+
+<div class="blog-summary">
+    {% if blog.content_html %}
+    {{ blog.content_html | safe }}
+    {% else %}
+    {{ blog.content }}
+    {% endif %}
+
+</div>

@@ -251,6 +251,7 @@ class Blog(db.Model):
     __tablename__ = 'blogs'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128))
+    summary = db.Column(db.Text)
     content = db.Column(db.Text)
     content_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -259,6 +260,14 @@ class Blog(db.Model):
 
     @staticmethod
     def on_change_content(target, value, oldvalue, initiator):
+        """
+        在服务端完成Markdown到Html的转换
+        :param target:
+        :param value:
+        :param oldvalue:
+        :param initiator:
+        :return:
+        """
         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
                         'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
                         'h1', 'h2', 'h3', 'p']
@@ -277,7 +286,8 @@ class Blog(db.Model):
         fake = Faker()
         u = User.query.filter_by(role_id=2).first()
         for i in range(count):
-            blog = Blog(title=fake.text()[0:20], body=fake.text(), timestamp=fake.past_date(), author=u)
+            blog = Blog(title=fake.text()[0:20], summary=fake.text(), content=fake.text(), timestamp=fake.past_date(),
+                        author=u)
             db.session.add(blog)
         db.session.commit()
 

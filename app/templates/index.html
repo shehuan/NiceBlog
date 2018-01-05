@@ -5,17 +5,21 @@
 {% block title %}NiceBlog{% endblock %}
 
 {% block page_content %}
-{% for blog in blogs %}
-<div class="post-content">
-    <h2 class="blog-title"><a>{{ blog.title }}</a></h2>
-    <div class="blog-body">{{ blog.body }}</div>
-    <div class="blog-date">{{ moment(blog.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
+<div class="row">
+    <div class="col-md-8">
+        {% for blog in blogs %}
+        <h2 class="blog-post-title"><a href="{{ url_for('main.blog', id=blog.id) }}">{{ blog.title }}</a></h2>
+        <div class="blog-date">{{ moment(blog.timestamp).format('YYYY年MM月DD日 HH:mm:ss') }}</div>
+        <p class="blog-summary">
+            {{ blog.summary }}
+        </p>
+        <hr>
+        {% endfor %}
+    </div>
 </div>
-<hr>
-{% endfor %}
 
 {% if pagination %}
-<div class="pagination">
+<div class="pagination-index">
     {{ macros.pagination_widget(pagination, 'main.index') }}
 </div>
 {% endif %}
