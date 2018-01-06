@@ -50,6 +50,7 @@ class User(UserMixin, db.Model):
     # 邮箱地址的md5值
     avatar_hash = db.Column(db.String(32))
     blogs = db.relationship('Blog', backref='author', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -257,9 +258,12 @@ class Blog(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     # 外键，和User表对应
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # 是否是草稿
+    draft = db.Column(db.Boolean)
+    comments = db.relationship('Comment', backref='blog', lazy='dynamic')
 
     @staticmethod
-    def on_change_content(target, value, oldvalue, initiator):
+    def on_changed_content(target, value, oldvalue, initiator):
         """
         在服务端完成Markdown到Html的转换
         :param target:
@@ -273,7 +277,7 @@ class Blog(db.Model):
                         'h1', 'h2', 'h3', 'p']
         # linkify()：把纯文本的URL转换成<a>链接
         target.content_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
+            markdown(value, output_format='html', charset='utf8'),
             tags=allowed_tags, strip=True))
 
     @staticmethod
@@ -294,4 +298,40 @@ class Blog(db.Model):
 
 # 把on_change_content函数注册在content字段上，当content改变时，会执行on_change_content，
 # 进而content_html会更新
-db.event.listen(Blog.content, 'set', Blog.on_change_content)
+db.event.listen(Blog.content, 'set', Blog.on_changed_content)
+
+
+class Comment(db.Model):
+    """
+    用户评论的数据模型
+    """
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text)
+    content_html = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    disabled = db.Column(db.Boolean)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    blog_id = db.Column(db.Integer, db.ForeignKey('blogs.id'))
+
+    @staticmethod
+    def on_changed_content(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
+                        'strong']
+        target.content_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, strip=True))
+
+    @staticmethod
+    def fake_comments(count=20):
+        fake = Faker()
+        u = User.query.filter_by(role_id=1).first()
+        blog = Blog.query.filter_by(id=208).first()
+        for i in range(count):
+            comment = Comment(content=fake.text(), timestamp=fake.past_date(),
+                              blog=blog, author=u)
+            db.session.add(comment)
+        db.session.commit()
+
+
+db.event.listen(Comment.content, 'set', Comment.on_changed_content)

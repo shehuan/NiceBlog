@@ -10,8 +10,18 @@ class NameForm(FlaskForm):
 
 
 class BlogForm(FlaskForm):
-    """创建/编辑博客表单"""
-    title = StringField('标题', validators=[DataRequired(), Length(1, 128)])
+    """
+    创建/编辑博客表单
+    """
+    title = StringField('文章标题', validators=[DataRequired(), Length(1, 128)])
     content = PageDownField('文章内容', validators=[DataRequired()])
     submit = SubmitField('发布')
     save = SubmitField('保存')
+
+
+class CommentForm(FlaskForm):
+    """
+    创建评论的表单
+    """
+    content = TextAreaField('写下你的评论...')
+    submit = SubmitField('发送')

@@ -2,21 +2,32 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_title %}{% if type == 'create' %}写文章{% elif type == 'edit' %}编辑文章{% endif %}{% endblock %}
-{% block page_content %}
-<div class="row">
-    <div class="col-md-6">
-        <form method="post">
-            {{ form.hidden_tag() }}
-            {{ form.title.label }} {{ form.title(class="form-control") }}
-            <br>
-            {{ form.content.label }}{{ form.content(class="form-control", rows="16") }}
-            <br>
-            {{ form.submit(class="btn btn-default") }}
-        </form>
-    </div>
-    <div class="col-md-6">
-
-    </div>
+{% block create_blog_content %}
+<div>
+    <form method="post" role="form">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group text-right">
+                    {{ form.submit(class="btn btn-primary") }}
+                    {{ form.save(class="btn btn-default") }}
+                </div>
+                <div class="form-group">
+                    {{ form.title(class="form-control", placeholder=form.title.label.text) }}
+                </div>
+                <div class="form-group">
+                    {{ form.content(only_input=True, class="input-markdown,
+                    form-control",placeholder=form.content.label.text) }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="class= form-group">
+                    <h2>{{ form.title.data }}</h2>
+                    {{ form.content(only_preview=True) }}
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}
 

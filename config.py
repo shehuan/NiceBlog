@@ -12,6 +12,8 @@ class Config(object):
 
     # 每页显示多少条博客
     BLOGS_PER_PAGE = 10
+    # 每页显示多少条评论
+    COMMENTS_PER_PAGE = 5
 
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
