@@ -4,7 +4,7 @@ from datetime import datetime
 import bleach
 from faker import Faker
 from flask import current_app, request
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_login import UserMixin, AnonymousUserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -266,6 +266,15 @@ class Blog(db.Model):
     comments = db.relationship('Comment', backref='blog', lazy='dynamic')
     favourites = db.relationship('Favourite', backref='blog', lazy='dynamic')
 
+    def is_current_user_favourite(self):
+        """
+        当前用户是否喜欢了该文章
+        """
+        if self.favourites and self.favourites.filter_by(user_id=current_user.id).first():
+            return True
+        else:
+            return False
+
     @staticmethod
     def on_changed_content(target, value, oldvalue, initiator):
         """
@@ -318,7 +327,7 @@ class Comment(db.Model):
     def fake_comments(count=40):
         fake = Faker()
         u = User.query.filter_by(role_id=1).first()
-        blog = Blog.query.filter_by(id=10).first()
+        blog = Blog.query.filter_by(id=26).first()
         for i in range(count):
             comment = Comment(content=fake.text(), timestamp=fake.past_date(),
                               blog=blog, user=u)

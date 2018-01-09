@@ -1,10 +1,10 @@
 from flask import flash, request, redirect, url_for
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from app import db
 from app.decorators import admin_required
 from app.manage import manage
-from app.models import Comment
+from app.models import Comment, Favourite, Blog
 
 
 @manage.route('/comment/disable/<int:id>')
@@ -52,3 +52,22 @@ def disable_enable_comment(id, status):
     db.session.add(comment)
     db.session.commit()
     return comment.blog.id
+
+
+@manage.route('/blog/favourite/<int:id>')
+@login_required
+def favourite_blog(id):
+    blog = Blog.query.get_or_404(id)
+    favourite = Favourite(user=current_user, blog=blog)
+    db.session.add(favourite)
+    db.session.commit()
+    return redirect(url_for('main.blog', id=id))
+
+
+@manage.route('/blog/cancel_favourite/<int:id>')
+@login_required
+def cancel_favourite_blog(id):
+    favourite = Favourite.query.filter_by(blog_id=id).first_or_404()
+    db.session.delete(favourite)
+    db.session.commit()
+    return redirect(url_for('main.blog', id=id))
