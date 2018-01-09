@@ -16,6 +16,33 @@
         <hr>
         {% endfor %}
     </div>
+
+    <div class="col-md-3 col-md-offset-1">
+        <div class="sidebar-module sidebar-module-inset">
+            <p>Othershe的个人博客</p>
+        </div>
+        <div class="sidebar-module">
+            <h4><b>文章分类</b></h4>
+            <ol class="list-unstyled">
+                <li><a href="{{ url_for('main.index')}}">全部</a></li>
+                <li><a href="{{ url_for('main.index')}}">Android</a></li>
+                <li><a href="{{ url_for('main.index')}}">Python</a></li>
+            </ol>
+            <hr>
+            <h4><b>关于我</b></h4>
+            <ol class="list-unstyled">
+                <li><a href="https://github.com/Othershe" target="_blank">
+                    <img class="github" src="{{ url_for('static', filename='github.ico') }}">  GitHub</a>
+                </li>
+                <li><a href="https://www.jianshu.com/u/4235f2b5b350" target="_blank">
+                    <img class="github" src="{{ url_for('static', filename='jianshu.ico') }}">  简书</a>
+                </li>
+                <li><a href="https://weibo.com/shehuan320" target="_blank">
+                    <img class="github" src="{{ url_for('static', filename='weibo.ico') }}">  微博</a>
+                </li>
+            </ol>
+        </div>
+    </div>
 </div>
 
 {% if pagination %}

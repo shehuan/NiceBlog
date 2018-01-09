@@ -17,12 +17,13 @@
                 </div>
                 <div class="form-group">
                     {{ form.content(only_input=True, class="input-markdown,
-                    form-control",placeholder=form.content.label.text) }}
+                    form-control",placeholder=form.content.label.text, rows=20) }}
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="class= form-group">
                     <h2>{{ form.title.data }}</h2>
+                    <hr>
                     {{ form.content(only_preview=True) }}
                 </div>
             </div>

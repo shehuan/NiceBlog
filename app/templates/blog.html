@@ -4,8 +4,9 @@
 
 {% block title %}{{ blog.title }}{% endblock %}
 {% block page_content %}
-<div>
+<div class="col-md-8 col-md-offset-2">
     {% if current_user.is_administrator() %}<a href="{{ url_for('main.edit_blog', id=blog.id) }}">编辑</a>{% endif %}
+    <a href="#comments"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span>评论({{blog.comments.count()}})</a>
     <h2>{{ blog.title }}</h2>
     <p>
         {% if blog.content_html %}
@@ -19,8 +20,8 @@
 {% include "_comments.html" %}
 
 {% if pagination %}
-<div class="col-md-7 pagination-comment">
-    {{ macros.pagination_widget(pagination, 'main.blog', id=blog.id) }}
+<div class="col-md-8 col-md-offset-2 pagination-comment">
+    {{ macros.pagination_widget(pagination, 'main.blog', id=blog.id, fragment='#comments') }}
 </div>
 {% endif %}
 

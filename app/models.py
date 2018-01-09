@@ -16,8 +16,8 @@ class Permission:
     """
     权限常量类
     """
-    # 喜欢/收藏
-    COLLECT = 1
+    # 喜欢某篇文章
+    FAVOURITE = 1
     # 评论
     COMMIT = 2
     # 写博客
@@ -49,8 +49,9 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     # 邮箱地址的md5值
     avatar_hash = db.Column(db.String(32))
-    blogs = db.relationship('Blog', backref='author', lazy='dynamic')
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    blogs = db.relationship('Blog', backref='user', lazy='dynamic')
+    comments = db.relationship('Comment', backref='user', lazy='dynamic')
+    favourites = db.relationship('Favourite', backref='user', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -189,8 +190,8 @@ class Role(db.Model):
     def inset_roles():
         # 定义角色对应的权限dict
         roles = {
-            'User': [Permission.COLLECT, Permission.COMMIT],
-            'Administrator': [Permission.COLLECT, Permission.COMMIT,
+            'User': [Permission.FAVOURITE, Permission.COMMIT],
+            'Administrator': [Permission.FAVOURITE, Permission.COMMIT,
                               Permission.WRITE, Permission.ADMIN]
         }
         default_role = 'User'
@@ -257,28 +258,21 @@ class Blog(db.Model):
     content_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     # 外键，和User表对应
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     # 是否是草稿
-    draft = db.Column(db.Boolean)
+    draft = db.Column(db.Boolean, default=True)
+    # 是否禁用评论
+    disable_comment = db.Column(db.Boolean, default=False)
     comments = db.relationship('Comment', backref='blog', lazy='dynamic')
+    favourites = db.relationship('Favourite', backref='blog', lazy='dynamic')
 
     @staticmethod
     def on_changed_content(target, value, oldvalue, initiator):
         """
         在服务端完成Markdown到Html的转换
-        :param target:
-        :param value:
-        :param oldvalue:
-        :param initiator:
-        :return:
         """
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
-                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'p']
-        # linkify()：把纯文本的URL转换成<a>链接
-        target.content_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html', charset='utf8'),
-            tags=allowed_tags, strip=True))
+        target.content_html = bleach.linkify(markdown(value, output_format='html',
+                                                      extensions=['markdown.extensions.extra']))
 
     @staticmethod
     def fake_blogs(count=50):
@@ -291,7 +285,7 @@ class Blog(db.Model):
         u = User.query.filter_by(role_id=2).first()
         for i in range(count):
             blog = Blog(title=fake.text()[0:20], summary=fake.text(), content=fake.text(), timestamp=fake.past_date(),
-                        author=u)
+                        user=u)
             db.session.add(blog)
         db.session.commit()
 
@@ -310,28 +304,34 @@ class Comment(db.Model):
     content = db.Column(db.Text)
     content_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    disabled = db.Column(db.Boolean)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # 该条评论是否已被屏蔽
+    disabled = db.Column(db.Boolean, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     blog_id = db.Column(db.Integer, db.ForeignKey('blogs.id'))
 
     @staticmethod
     def on_changed_content(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
-                        'strong']
-        target.content_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
-            tags=allowed_tags, strip=True))
+        target.content_html = bleach.linkify(markdown(value, output_format='html',
+                                                      extensions=['markdown.extensions.extra']))
 
     @staticmethod
-    def fake_comments(count=20):
+    def fake_comments(count=40):
         fake = Faker()
         u = User.query.filter_by(role_id=1).first()
-        blog = Blog.query.filter_by(id=208).first()
+        blog = Blog.query.filter_by(id=10).first()
         for i in range(count):
             comment = Comment(content=fake.text(), timestamp=fake.past_date(),
-                              blog=blog, author=u)
+                              blog=blog, user=u)
             db.session.add(comment)
         db.session.commit()
 
 
 db.event.listen(Comment.content, 'set', Comment.on_changed_content)
+
+
+class Favourite(db.Model):
+    __tablename__ = 'favourites'
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    blog_id = db.Column(db.Integer, db.ForeignKey('blogs.id'))

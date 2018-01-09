@@ -30,7 +30,7 @@ def user(username):
 def create_blog():
     form = BlogForm()
     if form.validate_on_submit():
-        blog = Blog(title=form.title.data, content=form.content.data, author=current_user._get_current_object())
+        blog = Blog(title=form.title.data, content=form.content.data, user=current_user._get_current_object())
         db.session.add(blog)
         db.session.commit()
         return redirect(url_for('main.index'))
@@ -55,7 +55,7 @@ def blog(id):
     blog = Blog.query.get_or_404(id)
     form = CommentForm()
     if form.validate_on_submit():
-        comment = Comment(content=form.content.data, blog=blog, author=current_user._get_current_object())
+        comment = Comment(content=form.content.data, blog=blog, user=current_user._get_current_object())
         db.session.add(comment)
         db.session.commit()
         flash('评论成功')

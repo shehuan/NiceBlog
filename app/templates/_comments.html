@@ -1,9 +1,9 @@
-<h3 class="col-md-8" id="comments">
+<h3 class="col-md-8 col-md-offset-2" id="comments">
     <hr>
     <b>『评论』</b></h3>
 
 {% if current_user.is_authenticated %}
-<div class="col-md-7 comment-form">
+<div class="col-md-8 col-md-offset-2">
     <form method='post' role="form">
         {{ form.hidden_tag() }}
         {{ form.content.label }} {{ form.content(class="form-control", rows="3") }}
@@ -12,12 +12,12 @@
     </form>
 </div>
 {% else %}
-<div class="col-md-7 nocomment">
+<div class="col-md-8 col-md-offset-2 nocomment">
     <span><h4><hr>想评论此文章？请先<a href="{{ url_for('auth.login') }}">登录</a>～</h4></span>
 </div>
 {% endif %}
 
-<div class="col-md-7">
+<div class="col-md-8 col-md-offset-2">
     <ul class="comments">
         {% if not comments %}
         <div class="nocomment">
@@ -27,11 +27,11 @@
         {% for comment in comments %}
         <li class="comment">
             <div class="comment-thumbnail">
-                <img class="img-rounded profile-thumbnail" src="{{ comment.author.gravatar(size=40) }}">
+                <img class="img-rounded profile-thumbnail" src="{{ comment.user.gravatar(size=40) }}">
             </div>
             <div class="comment-content">
                 <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
-                <div class="comment-author">{{ comment.author.username }}</div>
+                <div class="comment-author">{{ comment.user.username }}</div>
                 <div class="comment-body">
                     {% if comment.disabled %}
                     <p><i>该评论内容已被管理员屏蔽。</i></p>
@@ -50,6 +50,8 @@
                 <a class="btn btn-danger btn-xs"
                    href="{{ url_for('manage.disable_comment', id=comment.id, page=page) }}">屏蔽</a>
                 {% endif %}
+                <a class="btn btn-danger btn-xs"
+                   href="{{ url_for('manage.delete_comment', id=comment.id, page=page) }}">删除</a>
                 {% endif %}
             </div>
         </li>
