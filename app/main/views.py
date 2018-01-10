@@ -88,7 +88,6 @@ def add_label(labels, blog):
 
 
 @main.route('/blog/<int:id>', methods=['GET', 'POST'])
-@login_required
 def blog(id):
     blog = Blog.query.get_or_404(id)
     form = CommentForm()

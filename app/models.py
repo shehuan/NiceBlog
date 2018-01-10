@@ -375,5 +375,5 @@ class Label(db.Model):
         super(Label, self).__init__(**kw)
         types = ['info', 'danger', 'warning', 'success', 'primary', 'default']
         if self.type is None:
-            index = 1
-            self.type = types[index]
+            i = (Label.query.count()) % 6
+            self.type = types[i]
