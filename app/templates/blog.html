@@ -4,35 +4,42 @@
 
 {% block title %}{{ blog.title }}{% endblock %}
 {% block page_content %}
-    <div class="col-md-8 col-md-offset-2">
-        {% if current_user.is_administrator() %}<a href="{{ url_for('main.edit_blog', id=blog.id) }}">编辑</a>{% endif %}
-        <a href="#comments"><span class="glyphicon glyphicon-comment"
-                                  aria-hidden="true"></span>评论({{ blog.comments.count() }})</a>
-        {% if current_user.is_authenticated %}
-            {% if blog.is_current_user_favourite() %}
-                <a href="{{ url_for('manage.cancel_favourite_blog', id=blog.id) }}"><span
-                        class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp;取消收藏</a>&nbsp;
-            {% else %}
-                <a href="{{ url_for('manage.favourite_blog', id=blog.id) }}"><span
-                        class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>&nbsp;收藏</a>&nbsp;
-            {% endif %}
+<div class="col-md-8 col-md-offset-2">
+    <h2>{{ blog.title }}</h2>
+
+    {% if current_user.is_administrator() %}<a href="{{ url_for('main.edit_blog', id=blog.id) }}">编辑</a>{% endif %}
+    <a href="#comments"><span class="glyphicon glyphicon-comment"
+                              aria-hidden="true"></span>评论({{ blog.comments.count() }})</a>
+    <span><span class="glyphicon glyphicon-heart"
+                aria-hidden="true"></span>&nbsp;喜欢({{ blog.favourites.count() }})</span>
+
+    <p>
+        {% if blog.content_html %}
+        {{ blog.content_html | safe }}
+        {% else %}
+        {{ blog.content }}
         {% endif %}
-        <h2>{{ blog.title }}</h2>
-        <p>
-            {% if blog.content_html %}
-                {{ blog.content_html | safe }}
-            {% else %}
-                {{ blog.content }}
-            {% endif %}
-        </p>
-    </div>
+    </p>
 
-    {% include "_comments.html" %}
+    <hr>
 
-    {% if pagination %}
-        <div class="col-md-8 col-md-offset-2 pagination-comment">
-            {{ macros.pagination_widget(pagination, 'main.blog', id=blog.id, fragment='#comments') }}
-        </div>
+    {% if current_user.is_authenticated %}
+    {% if blog.is_current_user_favourite() %}
+    <a href="{{ url_for('manage.cancel_favourite_blog', id=blog.id) }}"><span
+            class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp;取消喜欢</a>&nbsp;
+    {% else %}
+    <a href="{{ url_for('manage.favourite_blog', id=blog.id) }}"><span
+            class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>&nbsp;喜欢</a>&nbsp;
     {% endif %}
+    {% endif %}
+</div>
+
+{% include "_comments.html" %}
+
+{% if pagination %}
+<div class="col-md-8 col-md-offset-2 pagination-comment">
+    {{ macros.pagination_widget(pagination, 'main.blog', id=blog.id, fragment='#comments') }}
+</div>
+{% endif %}
 
 {% endblock %}

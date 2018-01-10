@@ -9,6 +9,7 @@
     <div class="col-md-8">
         {% for blog in blogs %}
         <h2 class="blog-post-title"><a href="{{ url_for('main.blog', id=blog.id) }}">{{ blog.title }}</a></h2>
+        {% include "_labels.html" %}
         <div class="blog-date">{{ moment(blog.timestamp).format('YYYY年MM月DD日 HH:mm:ss') }}</div>
         <p class="blog-summary">
             {{ blog.summary }}
@@ -32,13 +33,13 @@
             <h4><b>关于我</b></h4>
             <ol class="list-unstyled">
                 <li><a href="https://github.com/Othershe" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='github.ico') }}">  GitHub</a>
+                    <img class="github" src="{{ url_for('static', filename='github.ico') }}"> GitHub</a>
                 </li>
                 <li><a href="https://www.jianshu.com/u/4235f2b5b350" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='jianshu.ico') }}">  简书</a>
+                    <img class="github" src="{{ url_for('static', filename='jianshu.ico') }}"> 简书</a>
                 </li>
                 <li><a href="https://weibo.com/shehuan320" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='weibo.ico') }}">  微博</a>
+                    <img class="github" src="{{ url_for('static', filename='weibo.ico') }}"> 微博</a>
                 </li>
             </ol>
         </div>

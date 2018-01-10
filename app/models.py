@@ -263,6 +263,8 @@ class Blog(db.Model):
     draft = db.Column(db.Boolean, default=True)
     # 是否禁用评论
     disable_comment = db.Column(db.Boolean, default=False)
+    # 被浏览的次数
+    views = db.Column(db.Integer)
     comments = db.relationship('Comment', backref='blog', lazy='dynamic')
     favourites = db.relationship('Favourite', backref='blog', lazy='dynamic')
 
@@ -339,8 +341,39 @@ db.event.listen(Comment.content, 'set', Comment.on_changed_content)
 
 
 class Favourite(db.Model):
+    """
+    喜欢的数据Model
+    """
     __tablename__ = 'favourites'
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     blog_id = db.Column(db.Integer, db.ForeignKey('blogs.id'))
+
+
+# Blog和Label多对多关系的中间表
+blog_labels = db.Table('blog_labels',
+                       db.Column('blog_id', db.Integer, db.ForeignKey('blogs.id')),
+                       db.Column('label_id', db.Integer, db.ForeignKey('labels.id')))
+
+
+class Label(db.Model):
+    """
+    blog分类标签的Model
+    """
+    __tablename__ = 'labels'
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(32))
+    name = db.Column(db.String(32))
+    # 多对多关系模型
+    blogs = db.relationship('Blog',
+                            secondary=blog_labels,
+                            backref=db.backref('labels', lazy='dynamic'),
+                            lazy='dynamic')
+
+    def __init__(self, **kw):
+        super(Label, self).__init__(**kw)
+        types = ['info', 'danger', 'warning', 'success', 'primary', 'default']
+        if self.type is None:
+            index = 1
+            self.type = types[index]

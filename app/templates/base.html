@@ -33,7 +33,7 @@
                         {{ current_user.username }} <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="">喜欢的文章</a></li>
+                        <li><a href="{{ url_for('manage.my_favourites') }}">喜欢的文章</a></li>
                         {% if current_user.is_administrator() %}
                         <li><a href="">草稿</a></li>
                         {% endif %}

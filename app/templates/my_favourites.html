@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block page_title %}我喜欢的文章{% endblock %}
+{% block page_content %}
+<div class="col-md-8 col-md-offset-2">
+    {% if favourites %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th class="th-left">文章名</th>
+            <th class="th-left">发布日期</th>
+            <th class="th-left">评论数</th>
+            <th class="th-left">喜欢数</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for favour in favourites %}
+        <tr>
+            <td><a href="{{ url_for('main.blog', id=favour.blog.id) }}">{{ favour.blog.title[:30] }}</a>
+            </td>
+            <td>{{ moment(favour.blog.timestamp).format('YYYY-MM-DD hh:mm:ss') }}</td>
+            <td class="td-center">{{ favour.blog.comments.count() }}</td>
+            <td class="td-center">{{ favour.blog.favourites.count() }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if pagination %}
+    <div class="col-md-8 col-md-offset-2 pagination-comment">
+        {{ macros.pagination_widget(pagination, 'manage.my_favourites') }}
+    </div>
+    {% endif %}
+    {% else %}
+    <h3>还没有喜欢的文章哦<a href="{{ url_for('main.index') }}">点我返回主页</a></h3>
+    {% endif %}
+</div>
+
+{% endblock %}

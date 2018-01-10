@@ -14,6 +14,7 @@ class BlogForm(FlaskForm):
     创建/编辑博客表单
     """
     title = StringField('文章标题', validators=[DataRequired(), Length(1, 128)])
+    labels = StringField('文章标签', validators=[DataRequired()])
     content = PageDownField('文章内容', validators=[DataRequired()])
     submit = SubmitField('发布')
     save = SubmitField('保存')
