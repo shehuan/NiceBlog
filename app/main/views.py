@@ -15,7 +15,7 @@ def index():
 
     # paginate('页码', '每页个数', 'False：超出总页数返回一个空白页，否则404')
     pagination = Blog.query.order_by(Blog.timestamp.desc()).paginate(page=page,
-                                                                     per_page=current_app.config['BLOGS_PER_PAGE'],
+                                                                     per_page=current_app.config['PER_PAGE_20'],
                                                                      error_out=False)
     blogs = pagination.items
     return render_template('index.html', blogs=blogs, pagination=pagination)
@@ -25,7 +25,7 @@ def index():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user)
+    return render_template('user_info.html', user=user)
 
 
 @main.route('/create-blog', methods=['GET', 'POST'])
@@ -100,7 +100,7 @@ def blog(id):
     page = request.args.get('page', 1, type=int)
     pagination = blog.comments.order_by(Comment.timestamp.desc()).paginate(page=page,
                                                                            per_page=current_app.config[
-                                                                               'COMMENTS_PER_PAGE'],
+                                                                               'PER_PAGE_5'],
                                                                            error_out=False)
     comments = pagination.items
     return render_template('blog.html', blog=blog, page=page, comments=comments, pagination=pagination, form=form)

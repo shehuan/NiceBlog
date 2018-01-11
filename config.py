@@ -10,10 +10,9 @@ class Config(object):
     # 管理员邮箱
     NICEBLOG_ADMIN = 'shehuan320@163.com'
 
-    # 每页显示多少条博客
-    BLOGS_PER_PAGE = 10
-    # 每页显示多少条评论
-    COMMENTS_PER_PAGE = 5
+    PER_PAGE_10 = 10
+    PER_PAGE_5 = 5
+    PER_PAGE_20 = 20
 
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False

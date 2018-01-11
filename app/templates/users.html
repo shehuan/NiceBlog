@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block page_title %}用户管理{% endblock %}
+{% block page_content %}
+<div class="col-md-8 col-md-offset-2">
+    {% if users %}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th class="th-left">昵称</th>
+            <th class="th-left">注册邮箱</th>
+            <th class="th-left">注册日期</th>
+            <th class="th-left">权限</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td><a href="{{ url_for('main.user', username=user.username) }}">{{ user.username }}</a>
+            </td>
+            <td>{{ user.email }}</td>
+            <td class="td-center">{{ moment(user.member_since).format('YYYY-MM-DD hh:mm:ss') }}</td>
+            <td class="td-center">
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="cb1" value="喜欢" checked> 喜欢
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="cb2" value="评论" checked> 评论
+                </label>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if pagination %}
+    <div class="col-md-8 col-md-offset-2 pagination-comment">
+        {{ macros.pagination_widget(pagination, 'manage.manage_users') }}
+    </div>
+    {% endif %}
+    {% else %}
+    <h3>还没有用户哦<a href="{{ url_for('main.index') }}">点我返回主页</a></h3>
+    {% endif %}
+</div>
+
+{% endblock %}

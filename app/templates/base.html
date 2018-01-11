@@ -36,6 +36,8 @@
                         <li><a href="{{ url_for('manage.my_favourites') }}">喜欢的文章</a></li>
                         {% if current_user.is_administrator() %}
                         <li><a href="">草稿</a></li>
+                        <li><a href="{{ url_for('manage.manage_users') }}">用户权限管理</a></li>
+                        <li><a href="{{ url_for('manage.manage_comments') }}">评论管理</a></li>
                         {% endif %}
                         <li><a href="{{ url_for('main.user', username=current_user.username) }}">个人信息</a></li>
                         <li><a href="{{ url_for('auth.change_password') }}">修改密码</a></li>
@@ -73,4 +75,5 @@
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
+{{ moment.lang("zh-CN") }}
 {% endblock %}

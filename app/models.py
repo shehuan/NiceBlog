@@ -23,7 +23,7 @@ class Permission:
     # 写博客
     WRITE = 4
     # 管理员
-    ADMIN = 16
+    ADMIN = 8
 
 
 class User(UserMixin, db.Model):
@@ -53,8 +53,8 @@ class User(UserMixin, db.Model):
     comments = db.relationship('Comment', backref='user', lazy='dynamic')
     favourites = db.relationship('Favourite', backref='user', lazy='dynamic')
 
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
+    def __init__(self, **kw):
+        super(User, self).__init__(**kw)
         if self.role is None:
             # 如果是管理员账号，则赋予该user管理员角色
             if self.email == current_app.config['NICEBLOG_ADMIN']:
@@ -138,6 +138,12 @@ class User(UserMixin, db.Model):
         """
         return self.can(Permission.ADMIN)
 
+    def can_favourite(self):
+        return self.can(Permission.FAVOURITE)
+
+    def can_commit(self):
+        return self.can(Permission.COMMIT)
+
     def ping(self):
         """
         更新最后访问日期
@@ -181,8 +187,8 @@ class Role(db.Model):
     # lazy='dynamic'：不直接加载查询记录，但提供对应的查询功能
     users = db.relationship('User', backref='role', lazy='dynamic')
 
-    def __init__(self, **kwargs):
-        super(Role, self).__init__(**kwargs)
+    def __init__(self, **kw):
+        super(Role, self).__init__(**kw)
         if self.permissions is None:
             self.permissions = 0
 
