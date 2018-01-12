@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block page_title %}我的草稿{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        {% if blogs %}
+        {% for blog in blogs %}
+        <h2 class="blog-post-title"><a href="{{ url_for('main.edit_blog', id=blog.id, type='create') }}"
+                                       target="_blank">{{ blog.title
+            }}</a></h2>
+        {% include "_labels.html" %}
+        <div class="blog-date">最后编辑日期 {{ moment(blog.edit_date).format('YYYY年MM月DD日 HH:mm:ss') }}</div>
+        <p class="blog-summary">
+            {{ blog.summary }}
+        </p>
+        <hr>
+        {% endfor %}
+        {% if pagination %}
+        <div class="pagination-index">
+            {{ macros.pagination_widget(pagination, 'main.index') }}
+        </div>
+        {% endif %}
+        {% else %}
+        <h3>还没有草稿哦<a href="{{ url_for('main.index') }}">点我返回主页</a></h3>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

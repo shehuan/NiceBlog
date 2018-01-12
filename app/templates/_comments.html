@@ -1,62 +1,66 @@
-<h3 class="col-md-8 col-md-offset-2" id="comments">
-    <hr>
-    <b>『评论』</b></h3>
+<h3 class="col-md-8 col-md-offset-2"><b>『评论』</b></h3>
 
 {% if current_user.is_authenticated %}
-    <div class="col-md-8 col-md-offset-2">
-        <form method='post' role="form">
-            {{ form.hidden_tag() }}
-            {{ form.content.label }} {{ form.content(class="form-control", rows="3") }}
-            <br>
-            {{ form.submit(class="btn btn-default") }}
-        </form>
-    </div>
+<div class="col-md-8 col-md-offset-2">
+    <form method='post' role="form">
+        {{ form.hidden_tag() }}
+        {{ form.content.label }} {{ form.content(class="form-control", rows="3") }}
+        <br>
+        {{ form.submit(class="btn btn-default") }}
+    </form>
+</div>
 {% else %}
-    <div class="col-md-8 col-md-offset-2 nocomment">
-        <span><h4><hr>想评论此文章？请先<a href="{{ url_for('auth.login') }}">登录</a>～</h4></span>
-    </div>
+<div class="col-md-8 col-md-offset-2 nocomment">
+    <span><h4><hr>想评论此文章？请先<a href="{{ url_for('auth.login') }}">登录</a>～</h4></span>
+</div>
 {% endif %}
 
-<div class="col-md-8 col-md-offset-2">
+<div id="comments" class="col-md-8 col-md-offset-2">
     <ul class="comments">
         {% if not comments %}
-            <div class="nocomment">
-                <span><h4><hr>--暂无评论--</h4></span>
-            </div>
+        <div class="nocomment">
+            <span><h4><hr>--暂无评论--</h4></span>
+        </div>
         {% else %}
-            {% for comment in comments %}
-                <li class="comment">
-                    <div class="comment-thumbnail">
-                        <img class="img-rounded profile-thumbnail" src="{{ comment.user.gravatar(size=40) }}">
-                    </div>
-                    <div class="comment-content">
-                        <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
-                        <div class="comment-author">
-                            {{ comment.user.username }}{% if comment.user.id == current_user.id %} (作者){% endif %}</div>
-                        <div class="comment-body">
-                            {% if comment.disabled %}
-                                <p><i>该评论内容已被管理员屏蔽。</i></p>
-                            {% endif %}
-                            {% if not comment.disabled or current_user.is_administrator() %}
-                                <p>{{ comment.content_html |safe }}</p>
-                            {% endif %}
-                        </div>
-                        <br>
-                        <br>
-                        {% if current_user.is_administrator() %}
-                            {% if comment.disabled %}
-                                <a class="btn btn-default btn-xs"
-                                   href="{{ url_for('manage.enable_comment', id=comment.id, page=page) }}">恢复</a>
-                            {% else %}
-                                <a class="btn btn-danger btn-xs"
-                                   href="{{ url_for('manage.disable_comment', id=comment.id, page=page) }}">屏蔽</a>
-                            {% endif %}
-                            <a class="btn btn-danger btn-xs"
-                               href="{{ url_for('manage.delete_comment', id=comment.id, page=page) }}">删除</a>
-                        {% endif %}
-                    </div>
-                </li>
-            {% endfor %}
+        {% for comment in comments %}
+        <li class="comment">
+            <div class="comment-thumbnail">
+                <img class="img-rounded profile-thumbnail" src="{{ comment.user.gravatar(size=40) }}">
+            </div>
+            <div class="comment-content">
+                <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
+                <div class="comment-author">
+                    {{ comment.user.username }}{% if comment.user.id == current_user.id %} (作者){% endif %}
+                </div>
+                <div class="comment-body">
+                    {% if comment.disabled %}
+                    <p><i>该评论内容已被管理员屏蔽。</i></p>
+                    {% endif %}
+                    {% if not comment.disabled or current_user.is_administrator() %}
+                    <p>{{ comment.content_html |safe }}</p>
+                    {% endif %}
+                </div>
+                <br>
+                <br>
+                {% if current_user.is_administrator() %}
+                {% if comment.disabled %}
+                <a class="btn btn-default btn-xs"
+                   href="{{ url_for('manage.enable_comment', id=comment.id, page=page) }}">恢复</a>
+                {% else %}
+                <a class="btn btn-danger btn-xs"
+                   href="{{ url_for('manage.disable_comment', id=comment.id, page=page) }}">屏蔽</a>
+                {% endif %}
+                <a class="btn btn-danger btn-xs"
+                   href="{{ url_for('manage.delete_comment', id=comment.id, page=page) }}">删除</a>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+        {% if pagination %}
+        <div class="col-md-8 col-md-offset-2 pagination-comment">
+            {{ macros.pagination_widget(pagination, 'main.blog', id=blog.id) }}
+        </div>
+        {% endif %}
         {% endif %}
     </ul>
 </div>

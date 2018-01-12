@@ -1,10 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
 
-</body>
-</html>
+{% block page_title %}评论管理{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <ul class="comments">
+            {% if comments %}
+            {% for comment in comments %}
+            <li class="comment">
+                <div class="comment-thumbnail">
+                    <img class="img-rounded profile-thumbnail" src="{{ comment.user.gravatar(size=40) }}">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
+                    <div class="comment-author">
+                        {{ comment.user.username }}{% if comment.user.id == current_user.id %} (作者){% endif %}
+                    </div>
+                    <div class="comment-body">
+                        {{ comment.content_html |safe }}
+                    </div>
+                    <div>
+                        {{ comment.blog.title }}
+                    </div>
+                    {% if comment.disabled %}
+                    <a class="btn btn-default btn-xs"
+                       href="{{ url_for('manage.enable_comment', id=comment.id, page=page, type='manage') }}">恢复</a>
+                    {% else %}
+                    <a class="btn btn-danger btn-xs"
+                       href="{{ url_for('manage.disable_comment', id=comment.id, page=page, type='manage') }}">屏蔽</a>
+                    {% endif %}
+                    <a class="btn btn-danger btn-xs"
+                       href="{{ url_for('manage.delete_comment', id=comment.id, page=page, type='manage') }}">删除</a>
+                </div>
+            </li>
+            {% endfor %}
+            {% if pagination %}
+            <div class="col-md-8 col-md-offset-2 pagination-comment">
+                {{ macros.pagination_widget(pagination, 'manage.manage_comments') }}
+            </div>
+            {% endif %}
+            {% else %}
+            <h3>还没有评论哦<a href="{{ url_for('main.index') }}">点我返回主页</a></h3>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

@@ -262,11 +262,14 @@ class Blog(db.Model):
     summary = db.Column(db.Text)
     content = db.Column(db.Text)
     content_html = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    # 发布日期
+    publish_date = db.Column(db.DateTime, index=True)
+    # 最后的编辑日期
+    edit_date = db.Column(db.DateTime, index=True)
     # 外键，和User表对应
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     # 是否是草稿
-    draft = db.Column(db.Boolean, default=True)
+    draft = db.Column(db.Boolean)
     # 是否禁用评论
     disable_comment = db.Column(db.Boolean, default=False)
     # 被浏览的次数
@@ -301,8 +304,8 @@ class Blog(db.Model):
         fake = Faker()
         u = User.query.filter_by(role_id=2).first()
         for i in range(count):
-            blog = Blog(title=fake.text()[0:20], summary=fake.text(), content=fake.text(), timestamp=fake.past_date(),
-                        user=u)
+            blog = Blog(title=fake.text()[0:20], summary=fake.text(), content=fake.text(), draft=False,
+                        publish_date=datetime.utcnow(), edit_date=datetime.utcnow(), user=u)
             db.session.add(blog)
         db.session.commit()
 
@@ -335,7 +338,7 @@ class Comment(db.Model):
     def fake_comments(count=40):
         fake = Faker()
         u = User.query.filter_by(role_id=1).first()
-        blog = Blog.query.filter_by(id=26).first()
+        blog = Blog.query.filter_by(id=102).first()
         for i in range(count):
             comment = Comment(content=fake.text(), timestamp=fake.past_date(),
                               blog=blog, user=u)

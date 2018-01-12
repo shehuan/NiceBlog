@@ -20,7 +20,7 @@
         <tr>
             <td><a href="{{ url_for('main.blog', id=favour.blog.id) }}">{{ favour.blog.title[:30] }}</a>
             </td>
-            <td>{{ moment(favour.blog.timestamp).format('YYYY-MM-DD hh:mm:ss') }}</td>
+            <td>{{ moment(favour.blog.publish_date).format('YYYY-MM-DD hh:mm:ss') }}</td>
             <td class="td-center">{{ favour.blog.comments.count() }}</td>
             <td class="td-center">{{ favour.blog.favourites.count() }}</td>
         </tr>

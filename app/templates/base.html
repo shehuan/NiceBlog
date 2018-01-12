@@ -35,7 +35,7 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ url_for('manage.my_favourites') }}">喜欢的文章</a></li>
                         {% if current_user.is_administrator() %}
-                        <li><a href="">草稿</a></li>
+                        <li><a href="{{ url_for('main.drafts') }}">草稿</a></li>
                         <li><a href="{{ url_for('manage.manage_users') }}">用户权限管理</a></li>
                         <li><a href="{{ url_for('manage.manage_comments') }}">评论管理</a></li>
                         {% endif %}

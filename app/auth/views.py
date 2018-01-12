@@ -26,6 +26,9 @@ def before_request():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    登录
+    """
     if current_user.is_authenticated:
         flash('您已经登录')
         return redirect(url_for('main.index'))
@@ -52,6 +55,9 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+    """
+    登出
+    """
     # 删除并重置用户会话
     logout_user()
     flash('您已经退出登录')
@@ -60,6 +66,9 @@ def logout():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    注册
+    """
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(email=form.email.data, username=form.username.data, password=form.password.data)
@@ -76,6 +85,9 @@ def register():
 @auth.route('/confirm/<token>')
 @login_required
 def confirm(token):
+    """
+    邮件确认
+    """
     # 已经通过邮件链接确认，则重定向到首页
     if current_user.confirmed:
         return redirect(url_for('main.index'))

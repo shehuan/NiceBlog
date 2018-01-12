@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import render_template, redirect, url_for, request, current_app, flash
 from flask_login import current_user, login_required
 
@@ -10,20 +12,46 @@ from app.models import User, Blog, Comment, Label
 
 @main.route('/')
 def index():
+    """
+    主页
+    """
     # 页码
     page = request.args.get('page', 1, type=int)
 
     # paginate('页码', '每页个数', 'False：超出总页数返回一个空白页，否则404')
-    pagination = Blog.query.order_by(Blog.timestamp.desc()).paginate(page=page,
-                                                                     per_page=current_app.config['PER_PAGE_20'],
-                                                                     error_out=False)
+    pagination = Blog.query.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(page=page,
+                                                                                               per_page=
+                                                                                               current_app.config[
+                                                                                                   'PER_PAGE_20'],
+                                                                                               error_out=False)
     blogs = pagination.items
     return render_template('index.html', blogs=blogs, pagination=pagination)
+
+
+@main.route('/drafts')
+@admin_required
+def drafts():
+    """
+    草稿列表
+    """
+    # 页码
+    page = request.args.get('page', 1, type=int)
+
+    # paginate('页码', '每页个数', 'False：超出总页数返回一个空白页，否则404')
+    pagination = Blog.query.filter_by(draft=True).order_by(Blog.edit_date.desc()).paginate(page=page,
+                                                                                           per_page=current_app.config[
+                                                                                               'PER_PAGE_20'],
+                                                                                           error_out=False)
+    blogs = pagination.items
+    return render_template('drafts.html', blogs=blogs, pagination=pagination)
 
 
 @main.route('/user/<username>')
 @login_required
 def user(username):
+    """
+    用户个人信息
+    """
     user = User.query.filter_by(username=username).first_or_404()
     return render_template('user_info.html', user=user)
 
@@ -31,9 +59,19 @@ def user(username):
 @main.route('/create-blog', methods=['GET', 'POST'])
 @admin_required
 def create_blog():
+    """
+    写新文章
+    """
     form = BlogForm()
     if form.validate_on_submit():
-        blog = Blog(title=form.title.data, content=form.content.data, user=current_user._get_current_object())
+        blog = None
+        if form.publish.data:
+            blog = Blog(title=form.title.data, summary=form.summary.data, content=form.content.data, draft=False,
+                        publish_date=datetime.utcnow(), edit_date=datetime.utcnow(),
+                        user=current_user._get_current_object())
+        elif form.save.data:
+            blog = Blog(title=form.title.data, summary=form.summary.data, content=form.content.data, draft=True,
+                        edit_date=datetime.utcnow(), user=current_user._get_current_object())
         db.session.add(blog)
 
         new_labels = form.labels.data.split(';')
@@ -47,11 +85,21 @@ def create_blog():
 @main.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
 @admin_required
 def edit_blog(id):
+    """
+    编辑已有文章
+    """
+    type = request.args.get('type', 1, type=str)
     blog = Blog.query.get_or_404(id)
     form = BlogForm()
     if form.validate_on_submit():
         blog.title = form.title.data
+        blog.summary = form.summary.data
         blog.content = form.content.data
+        blog.edit_date = datetime.utcnow()
+        if form.publish.data:
+            blog.publish_date = datetime.utcnow()
+            blog.draft = False
+
         db.session.add(blog)
         # 新标签list
         new_labels = form.labels.data.split(';')
@@ -72,8 +120,9 @@ def edit_blog(id):
         return redirect(url_for('main.blog', id=id))
     form.title.data = blog.title
     form.labels.data = ';'.join([label.name for label in blog.labels.all()])
+    form.summary.data = blog.summary
     form.content.data = blog.content
-    return render_template('create_blog.html', form=form, type='edit')
+    return render_template('create_blog.html', form=form, type=type)
 
 
 def add_label(labels, blog):
@@ -89,6 +138,9 @@ def add_label(labels, blog):
 
 @main.route('/blog/<int:id>', methods=['GET', 'POST'])
 def blog(id):
+    """
+    文章详情
+    """
     blog = Blog.query.get_or_404(id)
     form = CommentForm()
     if form.validate_on_submit():
