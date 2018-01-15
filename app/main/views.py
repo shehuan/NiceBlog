@@ -17,15 +17,30 @@ def index():
     """
     # 页码
     page = request.args.get('page', 1, type=int)
-
     # paginate('页码', '每页个数', 'False：超出总页数返回一个空白页，否则404')
     pagination = Blog.query.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(page=page,
                                                                                                per_page=
                                                                                                current_app.config[
                                                                                                    'PER_PAGE_20'],
                                                                                                error_out=False)
+    labels = Label.query.all()
     blogs = pagination.items
-    return render_template('index.html', blogs=blogs, pagination=pagination)
+    return render_template('index.html', blogs=blogs, labels=labels, pagination=pagination)
+
+
+@main.route('/<label_name>')
+def label_blogs(label_name):
+    """
+    根据标签查询blog
+    """
+    page = request.args.get('page', 1, type=int)
+    label = Label.query.filter_by(name=label_name).first()
+    pagination = label.blogs.order_by(Blog.publish_date.desc()).paginate(page=page,
+                                                                         per_page=current_app.config['PER_PAGE_20'],
+                                                                         error_out=False)
+    labels = Label.query.all()
+    blogs = pagination.items
+    return render_template('index.html', blogs=blogs, labels=labels, label_name=label_name, pagination=pagination)
 
 
 @main.route('/drafts')
@@ -96,7 +111,7 @@ def edit_blog(id):
         blog.summary = form.summary.data
         blog.content = form.content.data
         blog.edit_date = datetime.utcnow()
-        if form.publish.data:
+        if form.publish.data and type == 'create':
             blog.publish_date = datetime.utcnow()
             blog.draft = False
 
@@ -142,6 +157,9 @@ def blog(id):
     文章详情
     """
     blog = Blog.query.get_or_404(id)
+    blog.views = int(blog.views) + 1
+    db.session.add(blog)
+    db.session.commit()
     form = CommentForm()
     if form.validate_on_submit():
         comment = Comment(content=form.content.data, blog=blog, user=current_user._get_current_object())

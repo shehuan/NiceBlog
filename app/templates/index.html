@@ -5,55 +5,62 @@
 {% block title %}NiceBlog{% endblock %}
 
 {% block page_content %}
-<div class="row">
-    <div class="col-md-8">
-        {% for blog in blogs %}
-        <h2 class="blog-post-title"><a href="{{ url_for('main.blog', id=blog.id) }}" target="_blank">{{ blog.title
-            }}</a></h2>
-        {% include "_labels.html" %}
-        <div class="blog-date">{{ moment(blog.publish_date).format('YYYY年MM月DD日 HH:mm:ss') }}</div>
-        <p class="blog-summary">
-            {{ blog.summary }}
-        </p>
-        <a href="{{ url_for('main.blog', id=blog.id, _anchor='comments') }} " target="_blank">
-            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>评论({{ blog.comments.count() }})</a>
-        <span><span class="glyphicon glyphicon-heart"
-                    aria-hidden="true"></span>&nbsp;喜欢({{ blog.favourites.count() }})</span>
-        <hr>
-        {% endfor %}
-    </div>
-
-    <div class="col-md-3 col-md-offset-1">
-        <div class="sidebar-module sidebar-module-inset">
-            <p>Othershe的个人博客</p>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-1">
+            {% for blog in blogs %}
+                <h2 class="blog-post-title"><a href="{{ url_for('main.blog', id=blog.id) }}"
+                                               target="_blank">{{ blog.title }}</a></h2>
+                {% include "_labels.html" %}
+                <div class="blog-date">{{ moment(blog.publish_date).format('YYYY年MM月DD日 HH:mm:ss') }}</div>
+                <p class="blog-summary">
+                    {{ blog.summary }}
+                </p>
+                <span><span class="glyphicon glyphicon-eye-open"
+                            aria-hidden="true"></span> {{ blog.views }}</span>&nbsp&nbsp
+                <a href="{{ url_for('main.blog', id=blog.id, _anchor='comments') }}" target="_blank">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {{ blog.comments.count() }}</a>
+                &nbsp&nbsp
+                <span><span class="glyphicon glyphicon-heart"
+                            aria-hidden="true"></span> {{ blog.favourites.count() }}</span>
+                <hr>
+            {% endfor %}
         </div>
-        <div class="sidebar-module">
-            <h4><b>文章分类</b></h4>
-            <ol class="list-unstyled">
-                <li><a href="{{ url_for('main.index') }}">全部</a></li>
-                <li><a href="{{ url_for('main.index') }}">Android</a></li>
-                <li><a href="{{ url_for('main.index') }}">Python</a></li>
-            </ol>
+
+        <div class="col-md-3">
+            <p>
+            <h3>Othershe的个人博客</h3></p>
             <hr>
-            <h4><b>关于我</b></h4>
-            <ol class="list-unstyled">
-                <li><a href="https://github.com/Othershe" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='github.ico') }}"> GitHub</a>
-                </li>
-                <li><a href="https://www.jianshu.com/u/4235f2b5b350" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='jianshu.ico') }}"> 简书</a>
-                </li>
-                <li><a href="https://weibo.com/shehuan320" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='weibo.ico') }}"> 微博</a>
-                </li>
-            </ol>
+            <div class="sidebar-module">
+                <h4><b>文章分类</b></h4>
+                <ol class="list-unstyled sidebar-module sidebar-module-inset">
+                    <li><a href="{{ url_for('main.index') }}">全部</a></li>
+                    {% for label in labels %}
+                        <li><a href="{{ url_for('main.label_blogs', label_name=label.name) }}">{{ label.name }}</a></li>
+                    {% endfor %}
+                </ol>
+                <h4><b>关于我</b></h4>
+                <ol class="list-unstyled sidebar-module sidebar-module-inset">
+                    <li><a href="https://github.com/Othershe" target="_blank">
+                        <img class="github" src="{{ url_for('static', filename='github.ico') }}"> GitHub</a>
+                    </li>
+                    <li><a href="https://www.jianshu.com/u/4235f2b5b350" target="_blank">
+                        <img class="github" src="{{ url_for('static', filename='jianshu.ico') }}"> 简书</a>
+                    </li>
+                    <li><a href="https://weibo.com/shehuan320" target="_blank">
+                        <img class="github" src="{{ url_for('static', filename='weibo.ico') }}"> 微博</a>
+                    </li>
+                </ol>
+            </div>
         </div>
     </div>
-</div>
 
-{% if pagination %}
-<div class="pagination-index">
-    {{ macros.pagination_widget(pagination, 'main.index') }}
-</div>
-{% endif %}
+    {% if pagination %}
+        <div class="pagination-index">
+            {% if label_name %}
+                {{ macros.pagination_widget(pagination, 'main.label_blogs', label_name=label_name) }}
+            {% else %}
+                {{ macros.pagination_widget(pagination, 'main.index') }}
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}

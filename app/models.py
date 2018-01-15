@@ -338,7 +338,7 @@ class Comment(db.Model):
     def fake_comments(count=40):
         fake = Faker()
         u = User.query.filter_by(role_id=1).first()
-        blog = Blog.query.filter_by(id=102).first()
+        blog = Blog.query.filter_by(id=150).first()
         for i in range(count):
             comment = Comment(content=fake.text(), timestamp=fake.past_date(),
                               blog=blog, user=u)
