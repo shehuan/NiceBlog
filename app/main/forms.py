@@ -20,5 +20,5 @@ class CommentForm(FlaskForm):
     """
     创建评论的表单
     """
-    content = TextAreaField('写下你的评论...')
+    content = TextAreaField('写下你的评论...', validators=[DataRequired()])
     submit = SubmitField('发送')

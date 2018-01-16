@@ -158,12 +158,15 @@ def blog(id):
     db.session.add(blog)
     db.session.commit()
     form = CommentForm()
-    if form.validate_on_submit():
-        comment = Comment(content=form.content.data, blog=blog, user=current_user._get_current_object())
-        db.session.add(comment)
-        db.session.commit()
-        flash('评论成功')
-        return redirect(url_for('main.blog', id=id))
+    if form.submit.data:
+        if form.validate_on_submit():
+            comment = Comment(content=form.content.data, blog=blog, user=current_user._get_current_object())
+            db.session.add(comment)
+            db.session.commit()
+            flash('评论成功')
+            return redirect(url_for('main.blog', id=id))
+        else:
+            flash('评论内容不能为空')
     page = request.args.get('page', 1, type=int)
     pagination = blog.comments.order_by(Comment.timestamp.desc()).paginate(page=page,
                                                                            per_page=current_app.config[
