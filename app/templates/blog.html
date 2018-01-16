@@ -5,15 +5,25 @@
 {% block title %}{{ blog.title }}{% endblock %}
 {% block page_content %}
 <div class="col-md-8 col-md-offset-2">
-    <h2>{{ blog.title }}</h2>
-    {% include "_labels.html" %}
-    {% if current_user.is_administrator() %}
-    <a href="{{ url_for('main.edit_blog', id=blog.id, type='edit') }}">编辑</a>
-    {%endif %}
-    <a id="qaz" href="#comments"><span class="glyphicon glyphicon-comment"
-                                       aria-hidden="true"></span>评论({{ blog.comments.count() }})</a>
-    <span><span class="glyphicon glyphicon-heart"
-                aria-hidden="true"></span>&nbsp;喜欢({{ blog.favourites.count() }})</span>
+    <h1>{{ blog.title }}</h1>
+
+    <div class="row">
+        <div class="col-md-10">
+            {% include "_labels.html" %}
+            <ul class="list-inline blog-detail-ul">
+                <li>{{ moment(blog.publish_date).format('YYYY年MM月DD日 HH:mm') }}</li>
+                <li>阅读&nbsp{{ blog.views }}</li>
+                <li>评论&nbsp{{ blog.comments.count() }}</li>
+                <li>喜欢&nbsp{{ blog.favourites.count() }}</li>
+            </ul>
+        </div>
+        <div class="col-md-2">
+            {% if current_user.is_administrator() %}
+            <a class="btn btn-default blog-edit-btn"
+               href="{{ url_for('main.edit_blog', id=blog.id, type='edit') }}" role="button">编辑文章</a>
+            {%endif %}
+        </div>
+    </div>
 
     <p>
         {% if blog.content_html %}
@@ -27,11 +37,15 @@
 
     {% if current_user.is_authenticated %}
     {% if blog.is_current_user_favourite() %}
-    <a href="{{ url_for('manage.cancel_favourite_blog', id=blog.id) }}"><span
-            class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp;取消喜欢</a>&nbsp;
+    <a class="btn blog-favourite-btn" href="{{ url_for('manage.cancel_favourite_blog', id=blog.id) }}"
+       role="button">
+        <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp取消喜欢
+    </a>
     {% else %}
-    <a href="{{ url_for('manage.favourite_blog', id=blog.id) }}"><span
-            class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>&nbsp;喜欢</a>&nbsp;
+    <a class="btn blog-unfavourite-btn" href="{{ url_for('manage.favourite_blog', id=blog.id) }}"
+       role="button">
+        <span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>&nbsp喜欢
+    </a>
     {% endif %}
     {% endif %}
 </div>

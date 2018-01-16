@@ -1,12 +1,15 @@
-<h3 class="col-md-8 col-md-offset-2"><b>『评论』</b></h3>
+<h3 class="col-md-8 col-md-offset-2 blog-commit-title"><b>评论</b></h3>
 
 {% if current_user.is_authenticated %}
 <div class="col-md-8 col-md-offset-2">
     <form method='post' role="form">
         {{ form.hidden_tag() }}
-        {{ form.content.label }} {{ form.content(class="form-control", rows="3") }}
-        <br>
-        {{ form.submit(class="btn btn-default") }}
+        <div class="form-group">
+            {{ form.content(class="form-control", rows="3", placeholder=form.content.label.text) }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-success blog-commit-btn pull-right") }}
+        </div>
     </form>
 </div>
 {% else %}

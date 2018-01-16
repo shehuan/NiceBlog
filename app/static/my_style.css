@@ -11,36 +11,11 @@ h2, .h2,
 h3, .h3,
 h4, .h4,
 h5, .h5,
-h6, .h6, p {
+h6, .h6 {
     margin-top: 0;
     font-family: Microsoft YaHei, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: normal;
     color: #333;
-}
-
-p {
-    font-size: 16px;
-}
-
-/*
- * Blog name and description
- */
-
-.blog-header {
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-
-.blog-title {
-    margin-top: 30px;
-    margin-bottom: 0;
-    font-size: 60px;
-    font-weight: normal;
-}
-
-.blog-description {
-    font-size: 20px;
-    color: #999;
 }
 
 /*
@@ -70,28 +45,116 @@ p {
     margin-bottom: 0;
 }
 
-/*
- * Blog posts
- */
-
-.blog-post {
-    margin-bottom: 20px;
-    line-height: 1.8;
+/*blog list title*/
+.blog-title a {
+    text-decoration: none;
 }
 
-.blog-post-title {
+.blog-title a:link {
+    color: black;
+}
+
+.blog-title a:visited {
+    color: black;
+}
+
+.blog-title a:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.blog-title a:active {
+    color: black;
+}
+
+/*blog list date*/
+.blog-date {
+    color: gray;
+    margin-top: 5px;
+}
+
+/*blog list summary*/
+.blog-summary {
     margin-bottom: 5px;
-    font-size: 26px;
+    margin-top: 5px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333333;
 }
 
-.blog-description {
-    font-size: 14px;
+/*blog list views favourite*/
+.list-inline li, a {
+    color: gray;
 }
 
-.blog-post-meta {
-    margin-bottom: 12px;
-    color: #999;
-    font-size: 14px;
+/*blog list comment*/
+.list-inline a {
+    text-decoration: none;
+}
+
+.list-inline a:link {
+    color: gray;
+}
+
+.list-inline a:visited {
+    color: gray;
+}
+
+.list-inline a:hover {
+    color: gray;
+    text-decoration: none;
+}
+
+.list-inline a:active {
+    color: gray;
+}
+
+.blog-detail-ul {
+    margin-top: 10px;
+}
+
+.blog-detail-ul > li {
+    font-size: 12px;
+    color: gray;
+}
+
+.blog-edit-btn {
+    border-radius: 25px;
+    color: gray;
+}
+
+.blog-favourite-btn {
+    border-radius: 25px;
+    border-color: #FF6347;
+    color: white;
+    background-color: #FF6347;
+}
+
+.blog-favourite-btn:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.blog-unfavourite-btn {
+    border-radius: 25px;
+    border-color: #FF6347;
+    color: #FF6347;
+    background-color: white;
+}
+
+.blog-unfavourite-btn:hover {
+    color: #FF6347;
+    text-decoration: none;
+}
+
+.blog-commit-title {
+    margin-top: 25px;
+}
+
+.blog-commit-btn {
+    border-radius: 25px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 /*
@@ -142,37 +205,12 @@ p {
 /*
  * href
  */
-.blog-post-read a {
+.blog-read a {
     text-decoration: none;
 }
 
-.blog-post-meta a {
+.blog-meta a {
     text-decoration: none;
-}
-
-.blog-post-title a {
-    text-decoration: none;
-}
-
-.blog-description a {
-    text-decoration: none;
-}
-
-.blog-post-title :link {
-    color: black
-}
-
-.blog-post-title :visited {
-    color: black;
-}
-
-.blog-post-title :hover {
-    color: black;;
-    text-decoration: none;
-}
-
-.blog-post-title :active {
-    color: black;
 }
 
 .list-unstyled a {

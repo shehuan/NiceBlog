@@ -9,9 +9,9 @@
     <div class="col-md-8 col-md-offset-2">
         {% if blogs %}
         {% for blog in blogs %}
-        <h2 class="blog-post-title"><a href="{{ url_for('main.edit_blog', id=blog.id, type='create') }}"
-                                       target="_blank">{{ blog.title
-            }}</a></h2>
+        <h2 class="blog-title">
+            <a href="{{ url_for('main.edit_blog', id=blog.id, type='create') }}" target="_blank">{{ blog.title}}</a>
+        </h2>
         {% include "_labels.html" %}
         <div class="blog-date">最后编辑日期 {{ moment(blog.edit_date).format('YYYY年MM月DD日 HH:mm:ss') }}</div>
         <p class="blog-summary">

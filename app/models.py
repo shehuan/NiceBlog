@@ -273,7 +273,7 @@ class Blog(db.Model):
     # 是否禁用评论
     disable_comment = db.Column(db.Boolean, default=False)
     # 被浏览的次数
-    views = db.Column(db.Integer)
+    views = db.Column(db.Integer, default=0)
     comments = db.relationship('Comment', backref='blog', lazy='dynamic')
     favourites = db.relationship('Favourite', backref='blog', lazy='dynamic')
 

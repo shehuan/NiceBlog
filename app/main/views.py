@@ -17,6 +17,18 @@ def index():
     """
     # 页码
     page = request.args.get('page', 1, type=int)
+    # 全部标签
+    labels = Label.query.all()
+    label_name = request.args.get('label_name', None, type=str)
+    # 按照标签类型查询
+    if label_name:
+        label = Label.query.filter_by(name=label_name).first()
+        pagination = label.blogs.order_by(Blog.publish_date.desc()).paginate(page=page,
+                                                                             per_page=current_app.config['PER_PAGE_20'],
+                                                                             error_out=False)
+        blogs = pagination.items
+        return render_template('index.html', blogs=blogs, labels=labels, label_name=label_name, pagination=pagination)
+
     # paginate('页码', '每页个数', 'False：超出总页数返回一个空白页，否则404')
     pagination = Blog.query.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(page=page,
                                                                                                per_page=
@@ -26,21 +38,6 @@ def index():
     labels = Label.query.all()
     blogs = pagination.items
     return render_template('index.html', blogs=blogs, labels=labels, pagination=pagination)
-
-
-@main.route('/<label_name>')
-def label_blogs(label_name):
-    """
-    根据标签查询blog
-    """
-    page = request.args.get('page', 1, type=int)
-    label = Label.query.filter_by(name=label_name).first()
-    pagination = label.blogs.order_by(Blog.publish_date.desc()).paginate(page=page,
-                                                                         per_page=current_app.config['PER_PAGE_20'],
-                                                                         error_out=False)
-    labels = Label.query.all()
-    blogs = pagination.items
-    return render_template('index.html', blogs=blogs, labels=labels, label_name=label_name, pagination=pagination)
 
 
 @main.route('/drafts')
