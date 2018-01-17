@@ -44,30 +44,29 @@
     </div>
 
     <div class="col-md-3 col-md-offset-1">
-        <p>
-        <h3>Othershe的个人博客</h3></p>
+        <h3>Othershe的个人博客</h3>
         <hr>
-        <div class="sidebar-module">
+        <h4><b>关于我</b></h4>
+        <ol class="list-unstyled main-sidebar">
+            <li><a href="https://github.com/Othershe" target="_blank">
+                <img src="{{ url_for('static', filename='github.ico') }}">&nbsp;GitHub</a>
+            </li>
+            <li><a href="https://www.jianshu.com/u/4235f2b5b350" target="_blank">
+                <img src="{{ url_for('static', filename='jianshu.ico') }}">&nbsp;简书</a>
+            </li>
+            <li><a href="https://weibo.com/shehuan320" target="_blank">
+                <img src="{{ url_for('static', filename='weibo.ico') }}">&nbsp;微博</a>
+            </li>
+        </ol>
+        <div class="main-sidebar-label-title">
             <h4><b>文章分类</b></h4>
-            <ol class="list-unstyled sidebar-module sidebar-module-inset">
-                <li><a href="{{ url_for('main.index') }}">全部</a></li>
-                {% for label in labels %}
-                <li><a href="{{ url_for('main.index', label_name=label.name) }}">{{ label.name }}</a></li>
-                {% endfor %}
-            </ol>
-            <h4><b>关于我</b></h4>
-            <ol class="list-unstyled sidebar-module sidebar-module-inset">
-                <li><a href="https://github.com/Othershe" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='github.ico') }}"> GitHub</a>
-                </li>
-                <li><a href="https://www.jianshu.com/u/4235f2b5b350" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='jianshu.ico') }}"> 简书</a>
-                </li>
-                <li><a href="https://weibo.com/shehuan320" target="_blank">
-                    <img class="github" src="{{ url_for('static', filename='weibo.ico') }}"> 微博</a>
-                </li>
-            </ol>
         </div>
+        <ul class="list-unstyled main-sidebar">
+            <li><a href="{{ url_for('main.index') }}">全部</a></li>
+            {% for label in labels %}
+            <li><a href="{{ url_for('main.index', label_name=label.name) }}">{{ label.name }}</a></li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock %}

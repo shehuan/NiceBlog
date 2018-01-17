@@ -1,72 +1,76 @@
 <h3 class="col-md-8 col-md-offset-2 blog-commit-title"><b>评论</b></h3>
 
 {% if current_user.is_authenticated %}
-    <div class="col-md-8 col-md-offset-2">
-        <form method='post' role="form">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.content(class="form-control blog-commit-area", rows="3", placeholder=form.content.label.text) }}
-            </div>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-success blog-commit-btn pull-right") }}
-            </div>
-        </form>
-    </div>
+<div class="col-md-8 col-md-offset-2">
+    <form method='post' role="form">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.content(class="form-control blog-commit-area", rows="3", placeholder=form.content.label.text) }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-success blog-commit-btn pull-right") }}
+        </div>
+    </form>
+</div>
 {% else %}
-    <div class="col-md-8 col-md-offset-2 comment-logout">
-        <h4><a href="{{ url_for('auth.login') }}">登录</a>后可以评论哦</h4>
-    </div>
+<div class="col-md-8 col-md-offset-2 comment-logout">
+    <h4><a href="{{ url_for('auth.login') }}">登录</a>后可以评论哦</h4>
+</div>
 {% endif %}
 
 <div id="comments" class="col-md-8 col-md-offset-2">
+    {% if not comments %}
+    <div class="comment-none">
+        <hr>
+        <h4>--暂无评论--</h4>
+    </div>
+    {% else %}
+    <hr>
     <ul class="comments">
-        {% if not comments %}
-            <div class="comment-logout">
-                <hr>
-                <h4>--暂无评论--</h4>
-            </div>
-        {% else %}
-            {% for comment in comments %}
-                <li>
-                    <img class="img-circle pull-left" src="{{ comment.user.gravatar(size=40) }}">
+        {% for comment in comments %}
+        <li>
+            <div class="row">
+                <div class="col-md-1">
+                    <img class="img-circle" src="{{ comment.user.gravatar(size=40) }}">
+                </div>
+                <div>
                     <div class="comment-user">
                         {{ comment.user.username }}{% if comment.user.id == current_user.id %} (作者){% endif %}
                     </div>
                     <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
-
-                    <div class="comment-content">
-
-                        <div class="comment-body">
-                            {% if comment.disabled %}
-                                <p><i>该评论内容已被管理员屏蔽</i></p>
-                            {% endif %}
-                            {% if not comment.disabled or current_user.is_administrator() %}
-                                <p>{{ comment.content_html |safe }}</p>
-                            {% endif %}
-                        </div>
-                        {% if current_user.is_administrator() %}
-                            <div>
-                                {% if comment.disabled %}
-                                    <a class="btn btn-warning btn-xs comment-edit-btn"
-                                       href="{{ url_for('manage.enable_comment', id=comment.id, page=page) }}">恢复</a>
-                                {% else %}
-                                    <a class="btn btn-warning btn-xs comment-edit-btn"
-                                       href="{{ url_for('manage.disable_comment', id=comment.id, page=page) }}">屏蔽</a>
-                                {% endif %}
-                                <a class="btn btn-danger btn-xs comment-edit-btn"
-                                   href="{{ url_for('manage.delete_comment', id=comment.id, page=page) }}">删除</a>
-                            </div>
-
-                        {% endif %}
-                    </div>
-                </li>
-                <hr>
-            {% endfor %}
-            {% if pagination %}
-                <div class="col-md-8 col-md-offset-2 pagination-comment">
-                    {{ macros.pagination_widget(pagination, 'main.blog', id=blog.id) }}
                 </div>
+            </div>
+
+            <div class="comment-content">
+                {% if comment.disabled %}
+                <p><b>该评论内容已被管理员屏蔽</b></p>
+                {% endif %}
+                {% if not comment.disabled or current_user.is_administrator() %}
+                <p>{{ comment.content_html |safe }}</p>
+                {% endif %}
+            </div>
+            {% if current_user.is_administrator() %}
+            <div class="text-right">
+                {% if comment.disabled %}
+                <a class="btn btn-warning btn-xs comment-edit-btn"
+                   href="{{ url_for('manage.enable_comment', id=comment.id, page=page) }}">恢复</a>
+                {% else %}
+                <a class="btn btn-warning btn-xs comment-edit-btn"
+                   href="{{ url_for('manage.disable_comment', id=comment.id, page=page) }}">屏蔽</a>
+                {% endif %}
+                <a class="btn btn-danger btn-xs comment-edit-btn"
+                   href="{{ url_for('manage.delete_comment', id=comment.id, page=page) }}">删除</a>
+            </div>
             {% endif %}
+            <hr>
+        </li>
+        {% endfor %}
+        {% if pagination %}
+        <div class="col-md-8 col-md-offset-2 pagination-comment">
+            {{ macros.pagination_widget(pagination, 'main.blog', id=blog.id) }}
+        </div>
         {% endif %}
     </ul>
+    {% endif %}
+
 </div>

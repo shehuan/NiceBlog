@@ -33,13 +33,11 @@
         {% endif %}
     </p>
 
-    <hr>
-
     {% if current_user.is_authenticated %}
     {% if blog.is_current_user_favourite() %}
     <a class="btn blog-favourite-btn" href="{{ url_for('manage.cancel_favourite_blog', id=blog.id) }}"
        role="button">
-        <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp取消喜欢
+        <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp喜欢
     </a>
     {% else %}
     <a class="btn blog-unfavourite-btn" href="{{ url_for('manage.favourite_blog', id=blog.id) }}"
