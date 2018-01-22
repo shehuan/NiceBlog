@@ -28,7 +28,7 @@
     <hr>
     <ul class="comments">
         {% for comment in comments %}
-        <li>
+        <li id="{{ comment.id }}">
             <div class="row">
                 <div class="col-md-1">
                     <img class="img-circle" src="{{ comment.user.gravatar(size=40) }}">
@@ -43,7 +43,7 @@
 
             <div class="comment-content">
                 {% if comment.disabled %}
-                <p><b>该评论内容已被管理员屏蔽</b></p>
+                <p class="disable_tip"><b>该评论内容已被管理员屏蔽</b></p>
                 {% endif %}
                 {% if not comment.disabled or current_user.is_administrator() %}
                 <p>{{ comment.content_html |safe }}</p>
@@ -52,13 +52,15 @@
             {% if current_user.is_administrator() %}
             <div class="text-right">
                 {% if comment.disabled %}
-                <a class="btn btn-warning btn-xs comment-edit-btn"
-                   href="{{ url_for('manage.enable_comment', id=comment.id, page=page) }}">恢复</a>
+                <!--href="{{ url_for('manage.enable_comment', id=comment.id, page=page) }}"-->
+                <a class="btn btn-warning btn-xs comment-edit-btn enable_comment"
+                   onclick=disable_enable_comment({{ comment.id }})>恢复</a>
                 {% else %}
-                <a class="btn btn-warning btn-xs comment-edit-btn"
-                   href="{{ url_for('manage.disable_comment', id=comment.id, page=page) }}">屏蔽</a>
+                <!--href="{{ url_for('manage.disable_comment', id=comment.id, page=page) }}"-->
+                <a class="btn btn-warning btn-xs comment-edit-btn disable_comment"
+                   onclick=disable_enable_comment({{ comment.id }})>屏蔽</a>
                 {% endif %}
-                <a class="btn btn-danger btn-xs comment-edit-btn"
+                <a class="btn btn-danger btn-xs comment-edit-btn delete_commit"
                    href="{{ url_for('manage.delete_comment', id=comment.id, page=page) }}">删除</a>
             </div>
             {% endif %}

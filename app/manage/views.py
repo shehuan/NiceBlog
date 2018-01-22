@@ -8,34 +8,27 @@ from app.manage.forms import PermissionForm
 from app.models import Comment, Favourite, Blog, Role, User
 
 
-@manage.route('/comment/disable/<int:id>')
+@manage.route('/comment/disable')
 @admin_required
-def disable_comment(id):
+def disable_comment():
     """
     屏蔽某条评论
     """
-    type = request.args.get('type', 1, type=str)
-    page = request.args.get('page', 1, type=int)
-    blog_id = disable_enable_comment(id, True)
-    flash('已屏蔽该条评论')
-    if type == 'manage':
-        return redirect(url_for('manage.manage_comments', page=page))
-    return redirect(url_for('main.blog', id=blog_id, page=page))
+    id = request.args.get('id', None)
+    disable_enable_comment(id, True)
+    return 'success'
 
 
-@manage.route('/comment/enable/<int:id>')
+@manage.route('/comment/enable')
 @admin_required
-def enable_comment(id):
+def enable_comment():
     """
     恢复某条评论
     """
-    type = request.args.get('type', 1, type=str)
-    page = request.args.get('page', 1, type=int)
-    blog_id = disable_enable_comment(id, False)
+    id = request.args.get('id', None)
+    disable_enable_comment(id, False)
     flash('已恢复该条评论')
-    if type == 'manage':
-        return redirect(url_for('manage.manage_comments', page=page))
-    return redirect(url_for('main.blog', id=blog_id, page=page))
+    return 'success'
 
 
 @manage.route('/comment/delete/<int:id>')
@@ -64,29 +57,31 @@ def disable_enable_comment(id, status):
     return comment.blog.id
 
 
-@manage.route('/blog/favourite/<int:id>')
+@manage.route('/blog/favourite')
 @login_required
-def favourite_blog(id):
+def favourite_blog():
     """
     喜欢某篇文章
     """
+    id = request.args.get('id', None)
     blog = Blog.query.get_or_404(id)
     favourite = Favourite(user=current_user, blog=blog)
     db.session.add(favourite)
     db.session.commit()
-    return redirect(url_for('main.blog', id=id))
+    return 'success'
 
 
-@manage.route('/blog/cancel_favourite/<int:id>')
+@manage.route('/blog/cancel_favourite')
 @login_required
-def cancel_favourite_blog(id):
+def cancel_favourite_blog():
     """
     取消喜欢某篇文章
     """
+    id = request.args.get('id', None)
     favourite = Favourite.query.filter_by(blog_id=id).first_or_404()
     db.session.delete(favourite)
     db.session.commit()
-    return redirect(url_for('main.blog', id=id))
+    return 'success'
 
 
 @manage.route('/blog/my_favourites')

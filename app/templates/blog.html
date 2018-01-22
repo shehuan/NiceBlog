@@ -14,7 +14,8 @@
                 <li>{{ moment(blog.publish_date).format('YYYY年MM月DD日 HH:mm') }}</li>
                 <li>阅读&nbsp{{ blog.views }}</li>
                 <li>评论&nbsp{{ blog.comments.count() }}</li>
-                <li>喜欢&nbsp{{ blog.favourites.count() }}</li>
+                <li class="favourite-count">喜欢&nbsp{{ blog.favourites.count() }}</li>
+                <li class="favourite-count">{{ blog.favourites.count() }}</li>
             </ul>
         </div>
         <div class="col-md-2">
@@ -35,12 +36,12 @@
 
     {% if current_user.is_authenticated %}
     {% if blog.is_current_user_favourite() %}
-    <a class="btn blog-favourite-btn" href="{{ url_for('manage.cancel_favourite_blog', id=blog.id) }}"
+    <a class="btn blog-favourite-btn" onclick=favourite({{ blog.id }})
        role="button">
         <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp喜欢
     </a>
     {% else %}
-    <a class="btn blog-unfavourite-btn" href="{{ url_for('manage.favourite_blog', id=blog.id) }}"
+    <a class="btn blog-unfavourite-btn" onclick=favourite({{ blog.id }})
        role="button">
         <span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>&nbsp喜欢
     </a>
@@ -50,4 +51,55 @@
 
 {% include "_comments.html" %}
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    //禁用或者恢复某条评论
+    disable_enable_comment = function (id) {
+        var li = $('#' + id);
+        if (li.find('.disable_comment').length > 0) {//禁用
+            $.get('/manage/comment/disable', {
+                id: id
+            }).done(function (data) {
+                var content = li.find('.comment-content');
+                var btn = li.find('.disable_comment');
+                btn.text('恢复');
+                btn.removeClass('disable_comment').addClass('enable_comment');
+                content.html('<p class="disable_tip"><b>该评论内容已被管理员屏蔽</b></p>' + content.html());
+            })
+        } else if (li.find('.enable_comment').length > 0) {//恢复
+            $.get('/manage/comment/enable', {
+                id: id
+            }).done(function (data) {
+                var li = $('#' + id);
+                li.find('.disable_tip').remove();
+                var btn = li.find('.enable_comment');
+                btn.text('屏蔽');
+                btn.removeClass('enable_comment').addClass('disable_comment');
+            })
+        }
+    };
+
+    //喜欢或者取消喜欢某篇文章
+    favourite = function (id) {
+        if ($('.blog-favourite-btn').length > 0) {//取消喜欢
+            $.get('/manage/blog/cancel_favourite', {
+                id: id
+            }).done(function (data) {
+                $('.blog-favourite-btn span').removeClass('glyphicon-heart').addClass('glyphicon-heart-empty');
+                $('.blog-favourite-btn').removeClass('blog-favourite-btn').addClass('blog-unfavourite-btn');
+            })
+        } else if ($('.blog-unfavourite-btn').length > 0) {//喜欢
+            $.get('/manage/blog/favourite', {
+                id: id
+            }).done(function (data) {
+                $('.blog-unfavourite-btn span').removeClass('glyphicon-heart-empty').addClass('glyphicon-heart');
+                $('.blog-unfavourite-btn').removeClass('blog-unfavourite-btn').addClass('blog-favourite-btn');
+            })
+        }
+    }
+
+</script>
 {% endblock %}
