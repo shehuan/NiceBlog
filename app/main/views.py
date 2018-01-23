@@ -114,7 +114,7 @@ def edit_blog(id):
 
         db.session.add(blog)
         # 新标签list
-        new_labels = form.labels.data.split(';')
+        new_labels = form.labels.data.split(' ')
 
         for label in blog.labels.all():
             # 如果原标签不在新标签list里边，则从标签的blogs属性移除当前blog
@@ -131,7 +131,7 @@ def edit_blog(id):
         db.session.commit()
         return redirect(url_for('main.blog', id=id))
     form.title.data = blog.title
-    form.labels.data = ';'.join([label.name for label in blog.labels.all()])
+    form.labels.data = ' '.join([label.name for label in blog.labels.all()])
     form.summary.data = blog.summary
     form.content.data = blog.content
     return render_template('create_blog.html', form=form, type=type)
@@ -173,4 +173,5 @@ def blog(id):
                                                                                'PER_PAGE_5'],
                                                                            error_out=False)
     comments = pagination.items
-    return render_template('blog.html', blog=blog, page=page, comments=comments, pagination=pagination, form=form)
+    return render_template('blog.html', blog=blog, page=page, comments=comments, pagination=pagination, form=form,
+                           next=request.url)

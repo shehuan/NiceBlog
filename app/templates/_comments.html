@@ -14,7 +14,7 @@
 </div>
 {% else %}
 <div class="col-md-8 col-md-offset-2 comment-logout">
-    <h4><a href="{{ url_for('auth.login') }}">登录</a>后可以评论哦</h4>
+    <h4><a href="{{ url_for('auth.login', next=next) }}">登录</a>后可以评论哦</h4>
 </div>
 {% endif %}
 

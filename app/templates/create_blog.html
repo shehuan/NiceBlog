@@ -15,27 +15,25 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.title(class="form-control", placeholder=form.title.label.text) }}
+                    {{ form.title(class="form-control blog-commit-area", placeholder=form.title.label.text) }}
                 </div>
                 <div class="form-group">
-                    {{ form.labels(class="form-control", placeholder=form.labels.label.text) }}
+                    {{ form.labels(class="form-control blog-commit-area", placeholder=form.labels.label.text) }}
                 </div>
 
                 <div class="form-group">
-                    {{ form.summary(class="form-control", placeholder=form.summary.label.text, rows=6) }}
+                    {{ form.summary(class="form-control blog-commit-area", placeholder=form.summary.label.text, rows=6)
+                    }}
                 </div>
 
                 <div class="form-group">
                     {{ form.content(only_input=True, class="input-markdown,
-                    form-control",placeholder=form.content.label.text, rows=40) }}
+                    form-control blog-commit-area",placeholder=form.content.label.text, rows=40) }}
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="class= form-group">
-                    <h2>{{ form.title.data }}</h2>
-                    <hr>
-                    {{ form.content(only_preview=True) }}
-                </div>
+            <div class="col-md-6" style="background-color: #FFFFF0; padding: 20px">
+                <h3>{{ form.title.data }}</h3>
+                {{ form.content(only_preview=True) }}
             </div>
         </div>
     </form>

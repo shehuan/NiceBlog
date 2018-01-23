@@ -335,3 +335,8 @@ div.comment-content {
     font-size: 10px;
 }
 
+.markdown-preview {
+    background-color: #FFFFF0;
+    padding: 20px;
+}
+
