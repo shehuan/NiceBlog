@@ -3,44 +3,47 @@
 
 {% block page_title %}{% if type == 'create' %}写文章{% elif type == 'edit' %}编辑文章{% endif %}{% endblock %}
 {% block create_blog_content %}
-<div>
-    <form method="post" role="form">
-        {{ form.hidden_tag() }}
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group text-right">
-                    {{ form.publish(class="btn btn-primary") }}
-                    {% if type=="create" %}
-                    {{ form.save(class="btn btn-default") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.title(class="form-control blog-commit-area", placeholder=form.title.label.text) }}
-                </div>
-                <div class="form-group">
-                    {{ form.labels(class="form-control blog-commit-area", placeholder=form.labels.label.text) }}
-                </div>
-
-                <div class="form-group">
-                    {{ form.summary(class="form-control blog-commit-area", placeholder=form.summary.label.text, rows=6)
-                    }}
-                </div>
-
-                <div class="form-group">
-                    {{ form.content(only_input=True, class="input-markdown,
-                    form-control blog-commit-area",placeholder=form.content.label.text, rows=40) }}
-                </div>
+<form method="post" role="form" class="height-100">
+    {{ form.hidden_tag() }}
+    <div class="row height-100">
+        <div class="col-md-6 height-100">
+            <div class="form-group text-right">
+                {{ form.publish(class="btn btn-primary") }}
+                {% if type=="create" %}
+                {{ form.save(class="btn btn-default") }}
+                {% endif %}
             </div>
-            <div class="col-md-6" style="background-color: #FFFFF0; padding: 20px">
-                <h3>{{ form.title.data }}</h3>
-                {{ form.content(only_preview=True) }}
+            <div class="form-group">
+                {{ form.title(class="form-control blog-commit-area", placeholder=form.title.label.text) }}
+            </div>
+            <div class="form-group">
+                {{ form.labels(class="form-control blog-commit-area", placeholder=form.labels.label.text) }}
+            </div>
+
+            <div class="form-group">
+                {{ form.summary(class="form-control blog-commit-area", placeholder=form.summary.label.text, rows=4)
+                }}
+            </div>
+
+            <div class="form-group height-100" style="background-color: #FF6347">
+                {{ form.content(only_input=True, class="input-markdown form-control blog-edit-area",
+                placeholder=form.content.label.text) }}
             </div>
         </div>
-    </form>
-</div>
+        <div class="col-md-6 markdown-preview">
+            <h3>{{ form.title.data }}</h3>
+            {{ form.content(only_preview=True) }}
+        </div>
+    </div>
+</form>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
 {{ pagedown.include_pagedown() }}
+<script>
+    $('.navbar').hide();
+    $('body').addClass('create-blog-body');
+    $('html').addClass('height-100');
+</script>
 {% endblock %}

@@ -6,7 +6,7 @@
 {% block page_content %}
 <div class="col-md-8 col-md-offset-2">
     {% if favourites %}
-    <table class="table table-striped">
+    <table class="table table-bordered table-hover">
         <thead>
         <tr>
             <th class="th-left">文章名</th>
@@ -18,7 +18,8 @@
         <tbody>
         {% for favour in favourites %}
         <tr>
-            <td><a href="{{ url_for('main.blog', id=favour.blog.id) }}">{{ favour.blog.title[:30] }}</a>
+            <td class="blog-title">
+                <a href="{{ url_for('main.blog', id=favour.blog.id) }}" target="_blank">{{ favour.blog.title[:40] }}</a>
             </td>
             <td>{{ moment(favour.blog.publish_date).format('YYYY-MM-DD hh:mm:ss') }}</td>
             <td class="td-center">{{ favour.blog.comments.count() }}</td>

@@ -16,7 +16,7 @@
         <p class=" blog-summary">
             {{ blog.summary }}
         </p>
-        <ul class="list-inline">
+        <ol class="list-inline">
             <li>
                 <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> {{ blog.views }}
             </li>
@@ -29,7 +29,7 @@
             <li>
                 <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> {{ blog.favourites.count() }}
             </li>
-        </ul>
+        </ol>
         <hr>
         {% endfor %}
         {% if pagination %}

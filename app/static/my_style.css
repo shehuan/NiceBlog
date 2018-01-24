@@ -1,5 +1,5 @@
 body {
-    padding-top: 80px;
+    margin-top: 80px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -84,17 +84,19 @@ h1, h2, h3, h4, h5, h6 {
     color: gray;
 }
 
+/*visited代表鼠标点击后颜色*/
 .list-inline a:visited {
     color: gray;
 }
 
+/*hover代表鼠标悬浮时的颜色*/
 .list-inline a:hover {
-    color: gray;
-    text-decoration: none;
+    color: black;
 }
 
+/*active代表鼠标点击但没抬起时的颜色*/
 .list-inline a:active {
-    color: gray;
+    color: black;
 }
 
 .blog-detail-ul {
@@ -338,5 +340,32 @@ div.comment-content {
 .markdown-preview {
     background-color: #FFFFF0;
     padding: 20px;
+    height: 100%;
+    overflow: auto;
+}
+
+.blog-edit-area {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    background-color: #f9f9f9;
+    border-color: #dddddd;
+    box-shadow: none;
+
+}
+
+.blog-edit-area:focus {
+    box-shadow: none;
+    border-color: #dddddd;
+}
+
+.create-blog-body {
+    margin-top: 0px;
+    height: 100%;
+    overflow-y: hidden;
+}
+
+.height-100 {
+    height: 100%;
 }
 
