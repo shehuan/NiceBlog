@@ -2,10 +2,10 @@ from flask import flash, request, redirect, url_for, render_template, current_ap
 from flask_login import login_required, current_user
 
 from app import db
-from app.decorators import admin_required
+from app.decorators import admin_required, favourite_required
 from app.manage import manage
 from app.manage.forms import PermissionForm
-from app.models import Comment, Favourite, Blog, Role, User
+from app.models import Comment, Favourite, Blog, Role, User, Permission
 
 
 @manage.route('/comment/disable')
@@ -16,7 +16,7 @@ def disable_comment():
     """
     id = request.args.get('id', None)
     disable_enable_comment(id, True)
-    return 'success'
+    return '200'
 
 
 @manage.route('/comment/enable')
@@ -28,7 +28,7 @@ def enable_comment():
     id = request.args.get('id', None)
     disable_enable_comment(id, False)
     flash('已恢复该条评论')
-    return 'success'
+    return '200'
 
 
 @manage.route('/comment/delete/<int:id>')
@@ -63,12 +63,15 @@ def favourite_blog():
     """
     喜欢某篇文章
     """
+    # 没有喜欢权限
+    if not current_user.can_favourite():
+        return '403'
     id = request.args.get('id', None)
     blog = Blog.query.get_or_404(id)
     favourite = Favourite(user=current_user, blog=blog)
     db.session.add(favourite)
     db.session.commit()
-    return 'success'
+    return '200'
 
 
 @manage.route('/blog/cancel_favourite')
@@ -81,7 +84,7 @@ def cancel_favourite_blog():
     favourite = Favourite.query.filter_by(blog_id=id).first_or_404()
     db.session.delete(favourite)
     db.session.commit()
-    return 'success'
+    return '200'
 
 
 @manage.route('/blog/my_favourites')
@@ -126,35 +129,21 @@ def manage_comments():
     return render_template('comments.html', comments=comments, pagination=pagination, page=page)
 
 
-@manage.route('/permission/add/<int:id>')
+@manage.route('/permission/change')
 @admin_required
-def add_permission(id):
+def change_permission():
     """
-    添加权限
+    更改用户权限，先清空再添加
     """
-    page = request.args.get('page', 1, type=int)
-    permission = request.args.get('permission', 0, type=int)
-    add_remove_permission(id=id, permission=permission, type='add')
-    return redirect(url_for('manage.manage_users', page=page))
-
-
-@manage.route('/permission/remove/<int:id>')
-@admin_required
-def remove_permission(id):
-    """
-    移除权限
-    """
-    page = request.args.get('page', 1, type=int)
-    permission = request.args.get('permission', 0, type=int)
-    add_remove_permission(id=id, permission=permission, type='remove')
-    return redirect(url_for('manage.manage_users', page=page))
-
-
-def add_remove_permission(id, permission, type):
+    favourite = request.args.get('favourite', 1, type=int)
+    comment = request.args.get('comment', 2, type=int)
+    id = request.args.get('id', None)
     user = User.query.filter_by(id=id).first()
-    if type == 'add':
-        user.role.add_permission(permission)
-    else:
-        user.role.remove_permission(permission)
+    user.role.reset_permissions()
+    if favourite == 1:
+        user.role.add_permission(Permission.FAVOURITE)
+    if comment == 1:
+        user.role.add_permission(Permission.COMMENT)
     db.session.add(user)
-    db.session.commit(user)
+    db.session.commit()
+    return '200'

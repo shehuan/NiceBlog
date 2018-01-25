@@ -94,8 +94,14 @@
             $.get('/manage/blog/favourite', {
                 id: id
             }).done(function (data) {
-                $('.blog-unfavourite-btn span').removeClass('glyphicon-heart-empty').addClass('glyphicon-heart');
-                $('.blog-unfavourite-btn').removeClass('blog-unfavourite-btn').addClass('blog-favourite-btn');
+                if ('200' === data) {
+                    $('.blog-unfavourite-btn span').removeClass('glyphicon-heart-empty').addClass('glyphicon-heart');
+                    $('.blog-unfavourite-btn').removeClass('blog-unfavourite-btn').addClass('blog-favourite-btn');
+                }
+
+                if ('403' === data) {
+                    alert('没有操作权限')
+                }
             })
         }
     }

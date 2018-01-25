@@ -19,7 +19,7 @@ class Permission:
     # 喜欢某篇文章
     FAVOURITE = 1
     # 评论
-    COMMIT = 2
+    COMMENT = 2
     # 写博客
     WRITE = 4
     # 管理员
@@ -141,8 +141,8 @@ class User(UserMixin, db.Model):
     def can_favourite(self):
         return self.can(Permission.FAVOURITE)
 
-    def can_commit(self):
-        return self.can(Permission.COMMIT)
+    def can_comment(self):
+        return self.can(Permission.COMMENT)
 
     def ping(self):
         """

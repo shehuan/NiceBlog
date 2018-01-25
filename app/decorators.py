@@ -1,7 +1,7 @@
 from functools import wraps
 
 from flask_login import current_user
-from flask import abort
+from flask import abort, redirect
 
 from app.models import Permission
 
@@ -21,3 +21,11 @@ def permission_required(permission):
 
 def admin_required(f):
     return permission_required(Permission.ADMIN)(f)
+
+
+def comment_required(f):
+    return permission_required(Permission.COMMENT)(f)
+
+
+def favourite_required(f):
+    return permission_required(Permission.FAVOURITE)(f)

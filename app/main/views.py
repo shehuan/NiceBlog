@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, redirect, url_for, request, current_app, flash
+from flask import render_template, redirect, url_for, request, current_app, flash, abort
 from flask_login import current_user, login_required
 
 from app import db
@@ -159,6 +159,10 @@ def blog(id):
     db.session.commit()
     form = CommentForm()
     if form.submit.data:
+        # 没有评论权限
+        if not current_user.can_comment():
+            abort(403)
+
         if form.validate_on_submit():
             comment = Comment(content=form.content.data, blog=blog, user=current_user._get_current_object())
             db.session.add(comment)

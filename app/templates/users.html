@@ -4,31 +4,46 @@
 
 {% block page_title %}用户管理{% endblock %}
 {% block page_content %}
-<div class="col-md-8 col-md-offset-2">
+<div class="col-md-12">
     {% if users %}
-    <table class="table .table-hover">
+    <table class="table table-bordered table-striped">
         <thead>
         <tr>
+            <th class="th-left">头像</th>
             <th class="th-left">昵称</th>
             <th class="th-left">注册邮箱</th>
             <th class="th-left">注册日期</th>
-            <th class="th-left">权限</th>
+            <th class="th-left">最后访问日期</th>
+            <th class="th-left">权限配置</th>
         </tr>
         </thead>
         <tbody>
         {% for user in users %}
         <tr>
-            <td><a href="{{ url_for('main.user', username=user.username) }}">{{ user.username }}</a>
-            </td>
+            <td><img class="im" src="{{ user.gravatar(size=40) }}"></td>
+            <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
-            <td class="td-center">{{ moment(user.member_since).format('YYYY-MM-DD hh:mm:ss') }}</td>
-            <td class="td-center">
+            <td>{{ moment(user.member_since).format('YYYY-MM-DD hh:mm:ss') }}</td>
+            <td>{{ moment(user.last_seen).format('YYYY-MM-DD HH:mm:ss') }}</td>
+            <td>
                 <label class="checkbox-inline">
-                    <input type="checkbox" id="cb1" value="喜欢" checked> 喜欢
+                    {% if user.can_favourite() %}
+                    <input class="cb1" type="checkbox" checked>
+                    {% else %}
+                    <input class="cb1" type="checkbox">
+                    {% endif %}
+                    喜欢
                 </label>
                 <label class="checkbox-inline">
-                    <input type="checkbox" id="cb2" value="评论" checked> 评论
+                    {% if user.can_comment() %}
+                    <input class="cb2" type="checkbox" checked>
+                    {% else %}
+                    <input class="cb2" type="checkbox">
+                    {% endif %}
+                    评论
                 </label>
+                <a class="btn btn-success btn-xs comment-edit-btn disable_comment"
+                   onclick=change_permission({{ user.id }})>确定</a>
             </td>
         </tr>
         {% endfor %}
@@ -44,4 +59,22 @@
     {% endif %}
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    change_permission = function (id) {
+        var cb1 = $('.cb1').is(':checked');
+        var cb2 = $('.cb2').is(':checked');
+
+        $.get('/manage/permission/change', {
+            id: id,
+            favourite: cb1 ? 1 : 0,
+            comment: cb2 ? 1 : 0
+        }).done(function (data) {
+            alert("权限配置成功")
+        })
+    }
+</script>
 {% endblock %}
