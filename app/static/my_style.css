@@ -201,7 +201,7 @@ h1, h2, h3, h4, h5, h6 {
  */
 
 .blog-footer {
-    margin-top: 20px;
+    margin-top: 40px;
     padding: 40px;
     color: #999;
     text-align: center;
@@ -209,18 +209,17 @@ h1, h2, h3, h4, h5, h6 {
     border-top: 1px solid #e5e5e5;
 }
 
-.blog-footer p:last-child {
-    margin-bottom: 0;
-
+.blog-footer a {
+    text-decoration: none;
+    color: #36648B;
 }
 
-.blog-footer p {
-    font-size: 14px;
+.blog-footer a :visited,
+.blog-footer a :hover,
+.blog-footer a :active {
+    color: #36648B;
 }
 
-/*
- * href
- */
 .blog-read a {
     text-decoration: none;
 }
@@ -233,47 +232,6 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: none;
     font-size: 16px;
     line-height: 1.5;
-}
-
-/*
- * Sidebar navigation
- */
-
-.nav-sidebar {
-    margin-right: -21px; /* 20px padding + 1px border */
-    margin-bottom: 20px;
-    margin-left: -20px;
-    background-color: #f5f5f5;
-    margin-top: 35px;
-}
-
-.nav-sidebar > li > a {
-    padding-right: 20px;
-    padding-left: 20px;
-}
-
-.nav-sidebar > .active > a,
-.nav-sidebar > .active > a:hover,
-.nav-sidebar > .active > a:focus {
-    color: #fff;
-    background-color: #428bca;
-}
-
-.sidebar {
-    top: 51px;
-    margin-top: -80px;
-    padding-right: 20px;
-    margin-right: 20px;
-    text-align: right;
-
-}
-
-.table-responsive {
-    padding-top: 0px;
-    padding-right: 50px;
-    padding-left: 30px;
-    text-align: center;
-    margin-bottom: 30px;
 }
 
 .table-striped th {
