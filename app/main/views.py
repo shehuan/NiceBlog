@@ -91,7 +91,7 @@ def create_blog():
 
         db.session.commit()
         return redirect(url_for('main.index'))
-    return render_template('create_blog.html', form=form, type='create')
+    return render_template('markdown_edit.html', form=form, type='create')
 
 
 @main.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
@@ -134,7 +134,7 @@ def edit_blog(id):
     form.labels.data = ' '.join([label.name for label in blog.labels.all()])
     form.summary.data = blog.summary
     form.content.data = blog.content
-    return render_template('create_blog.html', form=form, type=type)
+    return render_template('markdown_edit.html', form=form, type=type)
 
 
 def add_label(labels, blog):

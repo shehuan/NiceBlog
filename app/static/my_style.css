@@ -295,35 +295,32 @@ div.comment-content {
     font-size: 10px;
 }
 
-.markdown-preview {
-    background-color: #FFFFF0;
-    padding: 20px;
+.markdown-blog-body {
+    margin-top: 0;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
 }
 
-.blog-edit-area {
+.height-full {
+    height: 100%;
+}
+
+.markdown-panel {
+    height: 100%;
+    padding: 0;
+}
+
+#markdown-edit {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: #eeeeee;
+}
+
+#markdown-preview {
     height: 100%;
     width: 100%;
+    padding: 20px;
     overflow: auto;
-    background-color: #f9f9f9;
-    border-color: #dddddd;
-    box-shadow: none;
-
+    background-color: #FFFFF0;
 }
-
-.blog-edit-area:focus {
-    box-shadow: none;
-    border-color: #dddddd;
-}
-
-.create-blog-body {
-    margin-top: 0px;
-    height: 100%;
-    overflow-y: hidden;
-}
-
-.height-100 {
-    height: 100%;
-}
-
