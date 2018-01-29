@@ -2,6 +2,11 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='github_markdown.css') }}" type="text/css"/>
+{% endblock %}
+
 {% block title %}{{ blog.title }}{% endblock %}
 {% block page_content %}
 <div class="col-md-8 col-md-offset-2">
@@ -25,13 +30,15 @@
         </div>
     </div>
 
-    <p>
-        {% if blog.content_html %}
+    {% if blog.content_html %}
+    <div class="markdown-body">
         {{ blog.content_html | safe }}
-        {% else %}
+    </div>
+    {% else %}
+    <div>
         {{ blog.content }}
-        {% endif %}
-    </p>
+    </div>
+    {% endif %}
 
     {% if current_user.is_authenticated %}
     {% if blog.is_current_user_favourite() %}

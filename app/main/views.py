@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import render_template, redirect, url_for, request, current_app, flash, abort
 from flask_login import current_user, login_required
+from wtforms.validators import DataRequired
 
 from app import db
 from app.decorators import admin_required
@@ -78,11 +79,12 @@ def create_blog():
     if form.validate_on_submit():
         blog = None
         if form.publish.data:
-            blog = Blog(title=form.title.data, summary=form.summary.data, content=form.content.data, draft=False,
-                        publish_date=datetime.utcnow(), edit_date=datetime.utcnow(),
-                        user=current_user._get_current_object())
+            blog = Blog(title=form.title.data, summary=form.summary.data, content=form.content.data,
+                        content_html=form.preview.data, draft=False, publish_date=datetime.utcnow(),
+                        edit_date=datetime.utcnow(), user=current_user._get_current_object())
         elif form.save.data:
-            blog = Blog(title=form.title.data, summary=form.summary.data, content=form.content.data, draft=True,
+            blog = Blog(title=form.title.data, summary=form.summary.data, content=form.content.data,
+                        content_html=form.preview.data, draft=True,
                         edit_date=datetime.utcnow(), user=current_user._get_current_object())
         db.session.add(blog)
 
@@ -91,7 +93,7 @@ def create_blog():
 
         db.session.commit()
         return redirect(url_for('main.index'))
-    return render_template('markdown_edit.html', form=form, type='create')
+    return render_template('markdown_editor.html', form=form, type='create')
 
 
 @main.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
@@ -107,6 +109,7 @@ def edit_blog(id):
         blog.title = form.title.data
         blog.summary = form.summary.data
         blog.content = form.content.data
+        blog.content_html = form.preview.data
         blog.edit_date = datetime.utcnow()
         if form.publish.data and type == 'create':
             blog.publish_date = datetime.utcnow()
@@ -134,7 +137,7 @@ def edit_blog(id):
     form.labels.data = ' '.join([label.name for label in blog.labels.all()])
     form.summary.data = blog.summary
     form.content.data = blog.content
-    return render_template('markdown_edit.html', form=form, type=type)
+    return render_template('markdown_editor.html', form=form, type=type)
 
 
 def add_label(labels, blog):

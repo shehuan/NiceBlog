@@ -1,0 +1,100 @@
+{% extends "common_base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='github_markdown.css') }}" type="text/css"/>
+<script src="{{ url_for('static', filename='marked.js') }}"></script>
+<script src="{{ url_for('static', filename='ace-min/ace.js') }}"></script>
+{% endblock %}
+
+{% block page_title %}{% if type == 'create' %}写文章{% elif type == 'edit' %}编辑文章{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid height-full">
+    <form method="post" role="form" class="height-full">
+        {{ form.hidden_tag() }}
+        <div class="row height-full">
+            <div class="col-md-6 markdown-panel">
+                <div class="row" style="height: 40px">
+                    <div class="col-md-10">
+                        {{ form.title(id="title", class="editor-blog-title", placeholder=form.title.label.text) }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="pull-right" style="margin-top: 3px">
+                            {{ form.publish(class="btn btn-info") }}
+                            {% if type=="create" %}
+                            {{ form.save(class="btn btn-success") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    {{ form.labels(class="editor-blog-area", placeholder=form.labels.label.text) }}
+                </div>
+
+                <div>
+                    {{ form.summary(class="editor-blog-area", placeholder=form.summary.label.text, rows=4) }}
+                </div>
+                <div hidden>
+                    {{ form.content(id="content") }}
+                </div>
+
+                <div hidden>
+                    {{ form.preview(id="preview") }}
+                </div>
+
+                <div id="markdown-edit">{% if form.content.data %}{{ form.content.data }}{% endif %}</div>
+            </div>
+
+            <div class="col-md-6 markdown-panel">
+                <div id="markdown-preview" class="markdown-body"></div>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+    $('body').addClass('markdown-blog-body');
+    $('html').addClass('height-full');
+
+    var title = $(".editor-blog-title");
+
+    var ace_edit = ace.edit('markdown-edit');
+
+    title_detect();
+    $("#preview").text(marked(ace_edit.getValue()));
+
+    ace_edit.setTheme('ace/theme/chrome');
+    ace_edit.getSession().setMode('ace/mode/markdown');
+    ace_edit.renderer.setShowPrintMargin(false);
+    //字体大小
+    ace_edit.setFontSize(15);
+    //自动换行
+    ace_edit.setOption('wrap', 'free');
+
+    $("#markdown-edit").keyup(function () {
+        title_detect();
+        $("#content").text(ace_edit.getValue());
+        $("#preview").text(marked(ace_edit.getValue()));
+    });
+
+    title.keyup(title_detect);
+
+    function title_detect() {
+        var title_html = '';
+        if (title.val()) {
+            title_html = "<h1>" + title.val() + "</h1>"
+        }
+        $("#markdown-preview").html(title_html + marked(ace_edit.getValue()));
+    }
+
+</script>
+{% endblock %}
+
+

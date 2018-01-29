@@ -286,13 +286,13 @@ class Blog(db.Model):
         else:
             return False
 
-    @staticmethod
-    def on_changed_content(target, value, oldvalue, initiator):
-        """
-        在服务端完成Markdown到Html的转换
-        """
-        target.content_html = bleach.linkify(markdown(value, output_format='html',
-                                                      extensions=['markdown.extensions.extra']))
+    # @staticmethod
+    # def on_changed_content(target, value, oldvalue, initiator):
+    #     """
+    #     在服务端完成Markdown到Html的转换
+    #     """
+    #     target.content_html = bleach.linkify(markdown(value, output_format='html',
+    #                                                   extensions=['markdown.extensions.extra']))
 
     @staticmethod
     def fake_blogs(count=50):
@@ -312,7 +312,7 @@ class Blog(db.Model):
 
 # 把on_change_content函数注册在content字段上，当content改变时，会执行on_change_content，
 # 进而content_html会更新
-db.event.listen(Blog.content, 'set', Blog.on_changed_content)
+# db.event.listen(Blog.content, 'set', Blog.on_changed_content)
 
 
 class Comment(db.Model):
