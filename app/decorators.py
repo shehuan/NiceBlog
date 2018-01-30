@@ -1,7 +1,7 @@
 from functools import wraps
 
 from flask_login import current_user
-from flask import abort, redirect
+from flask import abort
 
 from app.models import Permission
 

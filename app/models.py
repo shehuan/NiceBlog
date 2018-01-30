@@ -3,13 +3,14 @@ from datetime import datetime
 
 import bleach
 from faker import Faker
-from flask import current_app, request
+from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db, login_manager
+from app.exceptions import ValidationError
 
 
 class Permission:
@@ -171,6 +172,38 @@ class User(UserMixin, db.Model):
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(url=url, hash=hash, size=size, default=default,
                                                                      rating=rating)
 
+    def generate_auth_token(self, expiration):
+        """
+        生成api接口访问的认证令牌
+        """
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_auth_token(token):
+        """
+        检验令牌
+        """
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+
+    def to_json(self):
+        """
+        完成User数据模型到JSON的转换
+        """
+        json_user = {
+            'username': self.username,
+            'email': self.email,
+            'location': self.location,
+            'about_me': self.about_me,
+            'member_since': self.member_since,
+        }
+        return json_user
+
 
 class Role(db.Model):
     """
@@ -294,6 +327,41 @@ class Blog(db.Model):
     #     target.content_html = bleach.linkify(markdown(value, output_format='html',
     #                                                   extensions=['markdown.extensions.extra']))
 
+    def to_json(self):
+        """
+        完成Blog数据模型到JSON的转换
+        """
+        json_blog = {
+            'id': self.id,
+            'title': self.title,
+            'summary': self.summary,
+            'content': self.content,
+            'content_html': self.content_html,
+            'publish_date': self.publish_date,
+            'labels': self.labels.all(),
+            'views': self.views,
+            'comment_count': self.comments.count(),
+            'favourite_count': self.favourites.count()
+        }
+        return json_blog
+
+    @staticmethod
+    def from_json(json_blog):
+        """
+        根据提交的数据生成Blog
+        """
+        title = json_blog.get('title')
+        summary = json_blog.get('summary')
+        content = json_blog.get('content')
+        labels = json_blog.get('labels')
+        if title is None or title == '':
+            return ValidationError('blog does not have a title')
+        if summary is None or summary == '':
+            return ValidationError('blog does not have a summary')
+        if content is None or content == '':
+            return ValidationError('blog does not have a content')
+        return Blog(content=content)
+
     @staticmethod
     def fake_blogs(count=50):
         """
@@ -334,6 +402,30 @@ class Comment(db.Model):
         target.content_html = bleach.linkify(markdown(value, output_format='html',
                                                       extensions=['markdown.extensions.extra']))
 
+    def to_json(self):
+        """
+        完成User数据模型到JSON的转换
+        """
+        json_comment = {
+            'id': self.id,
+            'content': self.content,
+            'timestamp': self.timestamp,
+            'disabled': self.member_since,
+            'username': self.user.username,
+            'avatar': self.user.gravatar(size=30)
+        }
+        return json_comment
+
+    @staticmethod
+    def from_json(json_comment):
+        """
+        将用户提交的评论JSON转成Comment
+        """
+        comment = json_comment.get('content')
+        if comment is None or comment == '':
+            raise ValidationError('comment does not have a content')
+        return Comment(content=comment)
+
     @staticmethod
     def fake_comments(count=40):
         fake = Faker()
@@ -358,6 +450,18 @@ class Favourite(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     blog_id = db.Column(db.Integer, db.ForeignKey('blogs.id'))
+
+    def to_json(self):
+        """
+        完成Favourite数据模型到JSON的转换
+        """
+        json_favourite = {
+            'id': self.id,
+            'timestamp': self.timestamp,
+            'blog_id': self.blog.id,
+            'blog_title': self.blog.title
+        }
+        return json_favourite
 
 
 # Blog和Label多对多关系的中间表
@@ -386,3 +490,13 @@ class Label(db.Model):
         if self.type is None:
             i = (Label.query.count()) % 6
             self.type = types[i]
+
+    def to_json(self):
+        """
+        完成Label数据模型到JSON的转换
+        """
+        json_label = {
+            'id': self.id,
+            'name': self.name,
+        }
+        return json_label

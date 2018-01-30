@@ -60,12 +60,18 @@ def create_app(config_name):
     # 注册main蓝本
     from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
     # 注册auth蓝本
     from app.auth import auth as auth_blueprint
     # 使用url_prefix注册后，蓝本中定义的所有路由都会加上指定前缀，/login --> /auth/login
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
     # 注册manage蓝本
     from app.manage import manage as manage_blueprint
     app.register_blueprint(manage_blueprint, url_prefix='/manage')
+
+    # 注册api蓝本
+    from app.api import api as api_blueprint
+    app.register_blueprint(api_blueprint, url_prefix='/api')
 
     return app

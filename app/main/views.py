@@ -2,7 +2,6 @@ from datetime import datetime
 
 from flask import render_template, redirect, url_for, request, current_app, flash, abort
 from flask_login import current_user, login_required
-from wtforms.validators import DataRequired
 
 from app import db
 from app.decorators import admin_required
