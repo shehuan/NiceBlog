@@ -11,6 +11,7 @@ from app.models import User
 auth = HTTPBasicAuth()
 
 
+@auth.verify_password
 def verify_password(email_or_token, password):
     """
     检验用户

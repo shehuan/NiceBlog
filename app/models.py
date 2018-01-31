@@ -336,9 +336,9 @@ class Blog(db.Model):
             'title': self.title,
             'summary': self.summary,
             'content': self.content,
-            'content_html': self.content_html,
+            'content_html': url_for('main.blog_preview', id=self.id, _external=True),
             'publish_date': self.publish_date,
-            'labels': self.labels.all(),
+            'labels': [label.name for label in self.labels.all()],
             'views': self.views,
             'comment_count': self.comments.count(),
             'favourite_count': self.favourites.count()

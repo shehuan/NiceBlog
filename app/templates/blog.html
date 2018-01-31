@@ -13,7 +13,7 @@
     <h1>{{ blog.title }}</h1>
 
     <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-8">
             {% include "_labels.html" %}
             <ul class="list-inline blog-detail-ul">
                 <li>{{ moment(blog.publish_date).format('YYYY年MM月DD日 HH:mm') }}</li>
@@ -22,10 +22,14 @@
                 <li class="favourite-count">喜欢&nbsp{{ blog.favourites.count() }}</li>
             </ul>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4 btn-group pull-right">
             {% if current_user.is_administrator() %}
-            <a class="btn btn-default blog-edit-btn"
-               href="{{ url_for('main.edit_blog', id=blog.id, type='edit') }}" role="button">编辑文章</a>
+            <a class="btn btn-success blog-edit-btn"
+               href="{{ url_for('main.edit_blog', id=blog.id, type='edit') }}" role="button">编辑</a>
+            <a class="btn btn-warning blog-edit-btn"
+               href="{{ url_for('manage.private_blog', id=blog.id) }}" role="button">私有</a>
+            <a class="btn btn-danger blog-edit-btn"
+               href="{{ url_for('manage.delete_blog', id=blog.id) }}" role="button">删除</a>
             {%endif %}
         </div>
     </div>

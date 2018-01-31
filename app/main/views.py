@@ -23,7 +23,7 @@ def index():
     # 按照标签类型查询
     if label_name:
         label = Label.query.filter_by(name=label_name).first()
-        pagination = label.blogs.order_by(Blog.publish_date.desc()).paginate(page=page,
+        pagination = label.blogs.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(page=page,
                                                                              per_page=current_app.config['PER_PAGE_20'],
                                                                              error_out=False)
         blogs = pagination.items
@@ -181,3 +181,12 @@ def blog(id):
     comments = pagination.items
     return render_template('blog.html', blog=blog, page=page, comments=comments, pagination=pagination, form=form,
                            next=request.url)
+
+
+@main.route('/blog/preview/<int:id>')
+def blog_preview(id):
+    """
+    为移动端提供的文章html页面
+    """
+    blog = Blog.query.get_or_404(id)
+    return render_template('blog_preview.html', title=blog.title, content=blog.content_html)

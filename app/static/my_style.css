@@ -110,7 +110,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .blog-edit-btn {
     border-radius: 25px;
-    color: gray;
 }
 
 .blog-favourite-btn {
@@ -357,3 +356,11 @@ div.comment-content {
     border-color: transparent;
 }
 
+.blog-preview {
+    margin-top: 30px;
+}
+
+.blog-preview-body {
+    margin-top: 30px;
+    margin-bottom: 50px;
+}

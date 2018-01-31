@@ -1,0 +1,26 @@
+{% extends "common_base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='github_markdown.css') }}" type="text/css"/>
+{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <h1>{{ title }}</h1>
+        <div class="markdown-body blog-preview">{{ content | safe }}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    $('body').addClass('blog-preview-body');
+</script>
+{% endblock %}
+
+

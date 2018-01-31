@@ -147,3 +147,28 @@ def change_permission():
     db.session.add(user)
     db.session.commit()
     return '200'
+
+
+@manage.route('/blog/delete/<int:id>')
+@admin_required
+def delete_blog(id):
+    """
+    删除文章
+    """
+    blog = Blog.query.get_or_404(id)
+    db.session.delete(blog)
+    db.session.commit()
+    return redirect(url_for('main.index'))
+
+
+@manage.route('/blog/private/<int:id>')
+@admin_required
+def private_blog(id):
+    """
+    将已发布的文章私有化，目前设定私有化后会变成草稿
+    """
+    blog = Blog.query.get_or_404(id)
+    blog.draft = True
+    db.session.add(blog)
+    db.session.commit()
+    return redirect(url_for('main.index'))
