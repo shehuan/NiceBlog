@@ -9,8 +9,7 @@ from . import main
 def forbidden(e):
     if request.accept_mimetypes.accept_json and \
             not request.accept_mimetypes.accept_html:
-        response = jsonify({'error': 'forbidden'})
-        response.status_code = 403
+        response = jsonify({'error': 'forbidden', 'code': '403', 'data': ''})
         return response
     return render_template('error/403.html'), 403
 
@@ -19,8 +18,7 @@ def forbidden(e):
 def page_not_found(e):
     if request.accept_mimetypes.accept_json and \
             not request.accept_mimetypes.accept_html:
-        response = jsonify({'error': 'not found'})
-        response.status_code = 404
+        response = jsonify({'error': 'not found', 'code': '404', 'data': ''})
         return response
     return render_template('error/404.html'), 404
 
@@ -29,7 +27,6 @@ def page_not_found(e):
 def internal_server_error(e):
     if request.accept_mimetypes.accept_json and \
             not request.accept_mimetypes.accept_html:
-        response = jsonify({'error': 'internal server error'})
-        response.status_code = 500
+        response = jsonify({'error': 'internal server error', 'code': '500', 'data': ''})
         return response
     return render_template('error/500.html'), 500

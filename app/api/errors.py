@@ -8,8 +8,7 @@ def bad_request(message):
     """
     请求不可用
     """
-    response = jsonify({'error': 'bad request', 'message': message})
-    response.status_code = 400
+    response = jsonify({'error': message, 'code': '400', 'data': ''})
     return response
 
 
@@ -17,8 +16,7 @@ def unauthorized(message):
     """
     请求未包含授权信息
     """
-    response = jsonify({'error': 'unauthorized', 'message': message})
-    response.status_code = 401
+    response = jsonify({'error': message, 'code': '401', 'data': ''})
     return response
 
 
@@ -26,8 +24,7 @@ def forbidden(message):
     """
     无访问权限
     """
-    response = jsonify({'error': 'forbidden', 'message': message})
-    response.status_code = 403
+    response = jsonify({'error': message, 'code': '403', 'data': ''})
     return response
 
 

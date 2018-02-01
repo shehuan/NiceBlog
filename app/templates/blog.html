@@ -22,7 +22,7 @@
                 <li class="favourite-count">喜欢&nbsp{{ blog.favourites.count() }}</li>
             </ul>
         </div>
-        <div class="col-md-4 btn-group pull-right">
+        <div class="col-md-4 text-right">
             {% if current_user.is_administrator() %}
             <a class="btn btn-success blog-edit-btn"
                href="{{ url_for('main.edit_blog', id=blog.id, type='edit') }}" role="button">编辑</a>
