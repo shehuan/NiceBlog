@@ -1,6 +1,7 @@
-from flask import request, current_app, jsonify
+from flask import request, current_app
 
 from app.api import api
+from app.api.responses import response
 from app.decorators import permission_required
 from app.models import Favourite, User, Permission
 
@@ -15,11 +16,12 @@ def get_favourites(user_id):
     pagination = user.favourites.order_by(Favourite.timestamp.desc()).paginate(
         page=page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
     favourites = pagination.items
-    return jsonify({
+    data = {
         'favourites': [favourite.to_json() for favourite in favourites],
         'current_page': page,
         'total_page': pagination.total
-    })
+    }
+    return response(data)
 
 
 @api.route('/blogs/<int:blog_id>/favourite')

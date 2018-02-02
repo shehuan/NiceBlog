@@ -1,7 +1,8 @@
-from flask import request, current_app, jsonify, g, url_for
+from flask import request, current_app, g
 
 from app import db
 from app.api import api
+from app.api.responses import response
 from app.decorators import permission_required
 from app.models import Blog, Comment, Permission, User
 
@@ -16,11 +17,12 @@ def get_comments(blog_id):
     pagination = blog.comments.order_by(Comment.timestamp.desc()).paginate(
         page=page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
     comments = pagination.items
-    return jsonify({
+    data = {
         'comments': [comment.to_json() for comment in comments],
         'current_page': page,
         'total_page': pagination.total
-    })
+    }
+    return response(data)
 
 
 @api.route('/users/<int:user_id>/comments')
@@ -33,11 +35,12 @@ def get_user_comments(user_id):
     pagination = user.comments.order_by(Comment.timestamp.desc()).paginate(
         page=page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
     comments = pagination.items
-    return jsonify({
+    data = {
         'comments': [comment.to_json() for comment in comments],
         'current_page': page,
         'total_page': pagination.total
-    })
+    }
+    return response(data)
 
 
 @api.route('/blogs/<int:blog_id>/comment/', methods=['POST'])
@@ -52,8 +55,4 @@ def add_comment(blog_id):
     comment.blog = blog
     db.session.add(comment)
     db.session.commit()
-    return jsonify({
-        'code': 6000,
-        'message': 'success',
-        'data': ''
-    })
+    return response()

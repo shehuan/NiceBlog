@@ -1,6 +1,5 @@
-from flask import jsonify
-
 from app.api import api
+from app.api.responses import response
 from app.models import Label
 
 
@@ -10,4 +9,5 @@ def get_labels():
     请求文章分类标签
     """
     labels = Label.query.all()
-    return jsonify({'labels': [label.to_json() for label in labels]})
+    data = {'labels': [label.to_json() for label in labels]}
+    return response(data)

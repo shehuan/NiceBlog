@@ -1,6 +1,7 @@
-from flask import request, current_app, jsonify
+from flask import request, current_app
 
 from app.api import api
+from app.api.responses import response
 from app.models import Blog, Label
 
 
@@ -13,11 +14,12 @@ def get_blogs():
     pagination = Blog.query.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(
         page=page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
     blogs = pagination.items
-    return jsonify({
+    data = {
         'blogs': [blog.to_json() for blog in blogs],
         'current_page': page,
         'total_page': pagination.total
-    })
+    }
+    return response(data)
 
 
 @api.route('/labels/<int:label_id>/blogs/')
@@ -30,11 +32,12 @@ def get_blogs_by_label(label_id):
     pagination = label.blogs.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(
         page=page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
     blogs = pagination.items
-    return jsonify({
+    data = {
         'blogs': [blog.to_json() for blog in blogs],
         'current_page': page,
         'total_page': pagination.total
-    })
+    }
+    return response(data)
 
 
 @api.route('/blogs/<int:blog_id>/')
@@ -43,4 +46,4 @@ def get_blog(blog_id):
     根据id请求文章详情
     """
     blog = Blog.query.get_or_404(blog_id)
-    return jsonify(blog.to_json())
+    return response(blog.to_json)
