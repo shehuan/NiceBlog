@@ -1,8 +1,9 @@
 from flask import g, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 
+from app import db
 from app.api import api
-from app.api.errors import unauthorized, forbidden
+from app.api.responses import unauthorized, forbidden, response
 from app.models import User
 
 """
@@ -11,7 +12,7 @@ from app.models import User
 auth = HTTPBasicAuth()
 
 
-@auth.verify_password
+# @auth.verify_password
 def verify_password(email_or_token, password):
     """
     检验用户口令，校验失败则HTTPAuth默认返回401，但可以自定义改错误
@@ -47,7 +48,7 @@ def auth_error():
     return unauthorized('Invalid credentials')
 
 
-@api.before_request
+# @api.before_request
 @auth.login_required
 def before_request():
     """
@@ -69,13 +70,29 @@ def get_token():
 
 @api.route('/login', methods=['POST'])
 def login():
+    """
+    登录
+    """
     email = request.args.get('email')
     password = request.args.get('password')
-    pass
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        return forbidden('邮箱不存在')
+    if user.verify_password(password):
+        print(email, password)
+        return response(user.to_json())
+    return forbidden('密码错误')
 
 
 @api.route('/register', methods=['POST'])
 def register():
+    """
+    注册，省去了PC端注册时邮件验证的步骤
+    """
     email = request.args.get('email')
     password = request.args.get('password')
-    pass
+    username = request.args.get('username')
+    user = User(email=email, username=username, password=password, confirmed=True)
+    db.session.add(user)
+    db.session.commit()
+    return response()

@@ -8,24 +8,28 @@ def bad_request(message):
     """
     请求不可用
     """
-    response = jsonify({'error': message, 'code': '400', 'data': ''})
-    return response
+    return jsonify({'error': message, 'code': '400', 'data': ''})
 
 
 def unauthorized(message):
     """
     请求未包含授权信息
     """
-    response = jsonify({'error': message, 'code': '401', 'data': ''})
-    return response
+    return jsonify({'error': message, 'code': '401', 'data': ''})
 
 
 def forbidden(message):
     """
     无访问权限
     """
-    response = jsonify({'error': message, 'code': '403', 'data': ''})
-    return response
+    return jsonify({'error': message, 'code': '403', 'data': ''})
+
+
+def response(data=''):
+    """
+    请求成功
+    """
+    return jsonify({'error': '', 'code': '200', 'data': data})
 
 
 @api.errorhandler(ValidationError)

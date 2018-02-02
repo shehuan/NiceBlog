@@ -196,11 +196,13 @@ class User(UserMixin, db.Model):
         完成User数据模型到JSON的转换
         """
         json_user = {
+            'id': self.id,
             'username': self.username,
             'email': self.email,
             'location': self.location,
             'about_me': self.about_me,
             'member_since': self.member_since,
+            'token': self.generate_auth_token(3600 * 24 * 7)
         }
         return json_user
 
@@ -355,11 +357,11 @@ class Blog(db.Model):
         content = json_blog.get('content')
         labels = json_blog.get('labels')
         if title is None or title == '':
-            return ValidationError('blog does not have a title')
+            return ValidationError('文章标题不能为空')
         if summary is None or summary == '':
-            return ValidationError('blog does not have a summary')
+            return ValidationError('文章概要不能为空')
         if content is None or content == '':
-            return ValidationError('blog does not have a content')
+            return ValidationError('文章内容不能为空')
         return Blog(content=content)
 
     @staticmethod
@@ -423,7 +425,7 @@ class Comment(db.Model):
         """
         comment = json_comment.get('content')
         if comment is None or comment == '':
-            raise ValidationError('comment does not have a content')
+            raise ValidationError('评论内容不能为空')
         return Comment(content=comment)
 
     @staticmethod
