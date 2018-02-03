@@ -2,7 +2,7 @@ from flask import flash, request, redirect, url_for, render_template, current_ap
 from flask_login import login_required, current_user
 
 from app import db
-from app.decorators import admin_required, favourite_required
+from app.decorators import admin_required
 from app.manage import manage
 from app.manage.forms import PermissionForm
 from app.models import Comment, Favourite, Blog, Role, User, Permission
@@ -95,7 +95,7 @@ def my_favourites():
     """
     page = request.args.get('page', 1, type=int)
     pagination = current_user.favourites.order_by(Favourite.timestamp.desc()).paginate(
-        page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
+        page=page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
     favourites = pagination.items
     return render_template('my_favourites.html', favourites=favourites, pagination=pagination)
 
@@ -108,9 +108,8 @@ def manage_users():
     """
     form = PermissionForm()
     page = request.args.get('page', 1, type=int)
-    pagination = Role.query.filter_by(name='User').first().users.paginate(page,
-                                                                          per_page=current_app.config['PER_PAGE_20'],
-                                                                          error_out=False)
+    pagination = Role.query.filter_by(name='User').first().users.paginate(
+        page=page, per_page=current_app.config['PER_PAGE_20'], error_out=False)
     users = pagination.items
     return render_template('users.html', form=form, users=users, pagination=pagination, page=page)
 
@@ -122,9 +121,8 @@ def manage_comments():
     管理评论
     """
     page = request.args.get('page', 1, type=int)
-    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(page,
-                                                                           per_page=current_app.config['PER_PAGE_10'],
-                                                                           error_out=False)
+    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
+        page=page, per_page=current_app.config['PER_PAGE_10'], error_out=False)
     comments = pagination.items
     return render_template('comments.html', comments=comments, pagination=pagination, page=page)
 
@@ -135,15 +133,15 @@ def change_permission():
     """
     更改用户权限，先清空再添加
     """
-    favourite = request.args.get('favourite', 1, type=int)
-    comment = request.args.get('comment', 2, type=int)
+    favourite = request.args.get('favourite', 0, type=int)
+    comment = request.args.get('comment', 0, type=int)
     id = request.args.get('id', None)
     user = User.query.filter_by(id=id).first()
-    user.role.reset_permissions()
+    user.reset_permissions()
     if favourite == 1:
-        user.role.add_permission(Permission.FAVOURITE)
+        user.add_permission(Permission.FAVOURITE)
     if comment == 1:
-        user.role.add_permission(Permission.COMMENT)
+        user.add_permission(Permission.COMMENT)
     db.session.add(user)
     db.session.commit()
     return '200'

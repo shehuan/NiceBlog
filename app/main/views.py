@@ -23,18 +23,14 @@ def index():
     # 按照标签类型查询
     if label_name:
         label = Label.query.filter_by(name=label_name).first()
-        pagination = label.blogs.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(page=page,
-                                                                             per_page=current_app.config['PER_PAGE_20'],
-                                                                             error_out=False)
+        pagination = label.blogs.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(
+            page=page, per_page=current_app.config['PER_PAGE_20'], error_out=False)
         blogs = pagination.items
         return render_template('index.html', blogs=blogs, labels=labels, label_name=label_name, pagination=pagination)
 
     # paginate('页码', '每页个数', 'False：超出总页数返回一个空白页，否则404')
-    pagination = Blog.query.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(page=page,
-                                                                                               per_page=
-                                                                                               current_app.config[
-                                                                                                   'PER_PAGE_20'],
-                                                                                               error_out=False)
+    pagination = Blog.query.filter_by(draft=False).order_by(Blog.publish_date.desc()).paginate(
+        page=page, per_page=current_app.config['PER_PAGE_20'], error_out=False)
     labels = Label.query.all()
     blogs = pagination.items
     return render_template('index.html', blogs=blogs, labels=labels, pagination=pagination)
@@ -50,10 +46,8 @@ def drafts():
     page = request.args.get('page', 1, type=int)
 
     # paginate('页码', '每页个数', 'False：超出总页数返回一个空白页，否则404')
-    pagination = Blog.query.filter_by(draft=True).order_by(Blog.edit_date.desc()).paginate(page=page,
-                                                                                           per_page=current_app.config[
-                                                                                               'PER_PAGE_20'],
-                                                                                           error_out=False)
+    pagination = Blog.query.filter_by(draft=True).order_by(Blog.edit_date.desc()).paginate(
+        page=page, per_page=current_app.config['PER_PAGE_20'], error_out=False)
     blogs = pagination.items
     return render_template('drafts.html', blogs=blogs, pagination=pagination)
 
@@ -174,19 +168,8 @@ def blog(id):
         else:
             flash('评论内容不能为空')
     page = request.args.get('page', 1, type=int)
-    pagination = blog.comments.order_by(Comment.timestamp.desc()).paginate(page=page,
-                                                                           per_page=current_app.config[
-                                                                               'PER_PAGE_5'],
-                                                                           error_out=False)
+    pagination = blog.comments.order_by(Comment.timestamp.desc()).paginate(
+        page=page, per_page=current_app.config['PER_PAGE_5'], error_out=False)
     comments = pagination.items
     return render_template('blog.html', blog=blog, page=page, comments=comments, pagination=pagination, form=form,
                            next=request.url)
-
-
-@main.route('/blog/preview/<int:id>')
-def blog_preview(id):
-    """
-    为移动端提供的文章html页面
-    """
-    blog = Blog.query.get_or_404(id)
-    return render_template('blog_preview.html', title=blog.title, content=blog.content_html)

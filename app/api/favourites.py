@@ -1,12 +1,13 @@
-from flask import request, current_app
+from flask import request, current_app, g
 
+from app import db
 from app.api import api
+from app.api.decorators import favourite_required
 from app.api.responses import response
-from app.decorators import permission_required
-from app.models import Favourite, User, Permission
+from app.models import Favourite, User, Blog
 
 
-@api.route('/users/<int:user_id>/favourites')
+@api.route('/users/<int:user_id>/favourites/')
 def get_favourites(user_id):
     """
      分页请求对应id的用户喜欢的文章
@@ -24,18 +25,25 @@ def get_favourites(user_id):
     return response(data)
 
 
-@api.route('/blogs/<int:blog_id>/favourite')
-@permission_required(Permission.FAVOURITE)
+@api.route('/blogs/<int:blog_id>/favourite/', methods=['POST'])
+@favourite_required
 def favourite_blog(blog_id):
     """
     喜欢某篇文章
     """
-    pass
+    blog = Blog.query.get_or_404(blog_id)
+    favourite = Favourite(user=g.current_user, blog=blog)
+    db.session.add(favourite)
+    db.session.commit()
+    return response()
 
 
-@api.route('/blogs/<int:blog_id>/unfavourite')
+@api.route('/blogs/<int:blog_id>/unfavourite/', methods=['POST'])
 def cancel_favourite_blog(blog_id):
     """
     取消喜欢某篇文章
     """
-    pass
+    favourite = Favourite.query.filter_by(blog_id=blog_id).first_or_404()
+    db.session.delete(favourite)
+    db.session.commit()
+    return response()

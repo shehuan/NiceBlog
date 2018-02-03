@@ -1,4 +1,4 @@
-from flask import request, current_app
+from flask import request, current_app, render_template
 
 from app.api import api
 from app.api.responses import response
@@ -40,10 +40,19 @@ def get_blogs_by_label(label_id):
     return response(data)
 
 
-@api.route('/blogs/<int:blog_id>/')
+@api.route('/blogs/<int:blog_id>')
 def get_blog(blog_id):
     """
     根据id请求文章详情
     """
     blog = Blog.query.get_or_404(blog_id)
-    return response(blog.to_json)
+    return response(blog.to_json())
+
+
+@api.route('/blog/preview/<int:blog_id>')
+def blog_preview(blog_id):
+    """
+    为移动端提供的文章html预览页面
+    """
+    blog = Blog.query.get_or_404(blog_id)
+    return render_template('blog_preview.html', title=blog.title, content=blog.content_html)

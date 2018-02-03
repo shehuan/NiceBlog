@@ -25,7 +25,7 @@ def forbidden(message):
     return jsonify({'error': message, 'code': '403', 'data': ''})
 
 
-def response(data=''):
+def response(data='success'):
     """
     请求成功
     """

@@ -10,7 +10,6 @@ from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db, login_manager
-from app.exceptions import ValidationError
 
 
 class Permission:
@@ -53,6 +52,8 @@ class User(UserMixin, db.Model):
     blogs = db.relationship('Blog', backref='user', lazy='dynamic')
     comments = db.relationship('Comment', backref='user', lazy='dynamic')
     favourites = db.relationship('Favourite', backref='user', lazy='dynamic')
+    # 用户权限
+    permissions = db.Column(db.Integer)
 
     def __init__(self, **kw):
         super(User, self).__init__(**kw)
@@ -60,8 +61,10 @@ class User(UserMixin, db.Model):
             # 如果是管理员账号，则赋予该user管理员角色
             if self.email == current_app.config['NICEBLOG_ADMIN']:
                 self.role = Role.query.filter_by(name='Administrator').first()
+                self.permissions = 15
             else:
                 self.role = Role.query.filter_by(default=True).first()
+                self.permissions = 3
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = self.gravatar_hash()
 
@@ -130,7 +133,7 @@ class User(UserMixin, db.Model):
         :param permission:
         :return:
         """
-        return self.role is not None and self.role.has_permission(permission)
+        return self.has_permission(permission)
 
     def is_administrator(self):
         """
@@ -206,51 +209,6 @@ class User(UserMixin, db.Model):
         }
         return json_user
 
-
-class Role(db.Model):
-    """
-    角色数据Model
-    """
-    __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    default = db.Column(db.Boolean(), default=False, index=True)
-    permissions = db.Column(db.Integer)
-    # 与当前角色相关联的用户组成的列表
-    # 'User'：当前Model关联的另一个Model
-    # backref='role'：给User添加一个role属性，定义反向关系
-    # lazy='dynamic'：不直接加载查询记录，但提供对应的查询功能
-    users = db.relationship('User', backref='role', lazy='dynamic')
-
-    def __init__(self, **kw):
-        super(Role, self).__init__(**kw)
-        if self.permissions is None:
-            self.permissions = 0
-
-    @staticmethod
-    def inset_roles():
-        # 定义角色对应的权限dict
-        roles = {
-            'User': [Permission.FAVOURITE, Permission.COMMIT],
-            'Administrator': [Permission.FAVOURITE, Permission.COMMIT,
-                              Permission.WRITE, Permission.ADMIN]
-        }
-        default_role = 'User'
-        for r in roles:
-            role = Role.query.filter_by(name=r).first()
-            # roles表中没有对应角色，则创建
-            if role is None:
-                role = Role(name=r)
-            # 重置权限
-            role.reset_permissions()
-            # 添加对应角色的权限
-            for permission in roles[r]:
-                role.add_permission(permission)
-            # 如果角色名是User，则default为True
-            role.default = (role.name == default_role)
-            db.session.add(role)
-        db.session.commit()
-
     def add_permission(self, permission):
         if not self.has_permission(permission):
             self.permissions += permission
@@ -264,6 +222,44 @@ class Role(db.Model):
 
     def has_permission(self, permission):
         return self.permissions & permission == permission
+
+
+class Role(db.Model):
+    """
+    角色数据Model
+    """
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean(), default=False, index=True)
+    # 与当前角色相关联的用户组成的列表
+    # 'User'：当前Model关联的另一个Model
+    # backref='role'：给User添加一个role属性，定义反向关系
+    # lazy='dynamic'：不直接加载查询记录，但提供对应的查询功能
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
+    def __init__(self, **kw):
+        super(Role, self).__init__(**kw)
+        if self.permissions is None:
+            self.permissions = 0
+
+    @staticmethod
+    def inset_roles():
+        # 定义角色dict
+        roles = {
+            'User',
+            'Administrator'
+        }
+        default_role = 'User'
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            # roles表中没有对应角色，则创建
+            if role is None:
+                role = Role(name=r)
+            # 如果角色名是User，则default为True
+            role.default = (role.name == default_role)
+            db.session.add(role)
+        db.session.commit()
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -337,8 +333,7 @@ class Blog(db.Model):
             'id': self.id,
             'title': self.title,
             'summary': self.summary,
-            'content': self.content,
-            'content_html': url_for('main.blog_preview', id=self.id, _external=True),
+            'content_html': url_for('api.blog_preview', blog_id=self.id, _external=True),
             'publish_date': self.publish_date,
             'labels': [label.name for label in self.labels.all()],
             'views': self.views,
@@ -346,23 +341,6 @@ class Blog(db.Model):
             'favourite_count': self.favourites.count()
         }
         return json_blog
-
-    @staticmethod
-    def from_json(json_blog):
-        """
-        根据提交的数据生成Blog
-        """
-        title = json_blog.get('title')
-        summary = json_blog.get('summary')
-        content = json_blog.get('content')
-        labels = json_blog.get('labels')
-        if title is None or title == '':
-            return ValidationError('文章标题不能为空')
-        if summary is None or summary == '':
-            return ValidationError('文章概要不能为空')
-        if content is None or content == '':
-            return ValidationError('文章内容不能为空')
-        return Blog(content=content)
 
     @staticmethod
     def fake_blogs(count=50):
@@ -412,21 +390,11 @@ class Comment(db.Model):
             'id': self.id,
             'content': self.content,
             'timestamp': self.timestamp,
-            'disabled': self.member_since,
+            'disabled': self.disabled,
             'username': self.user.username,
             'avatar': self.user.gravatar(size=30)
         }
         return json_comment
-
-    @staticmethod
-    def from_json(json_comment):
-        """
-        将用户提交的评论JSON转成Comment
-        """
-        comment = json_comment.get('content')
-        if comment is None or comment == '':
-            raise ValidationError('评论内容不能为空')
-        return Comment(content=comment)
 
     @staticmethod
     def fake_comments(count=40):

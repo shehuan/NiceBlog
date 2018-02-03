@@ -25,7 +25,7 @@
             <td>{{ user.email }}</td>
             <td>{{ moment(user.member_since).format('YYYY-MM-DD hh:mm:ss') }}</td>
             <td>{{ moment(user.last_seen).format('YYYY-MM-DD HH:mm:ss') }}</td>
-            <td>
+            <td id="{{ user.id }}">
                 <label class="checkbox-inline">
                     {% if user.can_favourite() %}
                     <input class="cb1" type="checkbox" checked>
@@ -65,9 +65,9 @@
 {{ super() }}
 <script>
     change_permission = function (id) {
-        var cb1 = $('.cb1').is(':checked');
-        var cb2 = $('.cb2').is(':checked');
-
+        var td = $('#' + id);
+        var cb1 = td.find('.cb1').is(':checked');
+        var cb2 = td.find('.cb2').is(':checked');
         $.get('/manage/permission/change', {
             id: id,
             favourite: cb1 ? 1 : 0,
