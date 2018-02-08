@@ -196,7 +196,7 @@ class User(UserMixin, db.Model):
 
     def to_json(self):
         """
-        完成User数据模型到JSON的转换
+        完成User数据模型到JSON格式化的序列化字典转换
         """
         json_user = {
             'id': self.id,
@@ -327,7 +327,7 @@ class Blog(db.Model):
 
     def to_json(self):
         """
-        完成Blog数据模型到JSON的转换
+        完成Blog数据模型到JSON格式化的序列化字典转换
         """
         json_blog = {
             'id': self.id,
@@ -384,7 +384,7 @@ class Comment(db.Model):
 
     def to_json(self):
         """
-        完成User数据模型到JSON的转换
+        完成User数据模型到JSON格式化的序列化字典转换
         """
         json_comment = {
             'id': self.id,
@@ -423,7 +423,7 @@ class Favourite(db.Model):
 
     def to_json(self):
         """
-        完成Favourite数据模型到JSON的转换
+        完成Favourite数据模型到JSON格式化的序列化字典转换
         """
         json_favourite = {
             'id': self.id,
@@ -463,7 +463,7 @@ class Label(db.Model):
 
     def to_json(self):
         """
-        完成Label数据模型到JSON的转换
+        完成Label数据模型到JSON格式化的序列化字典转换
         """
         json_label = {
             'id': self.id,

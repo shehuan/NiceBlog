@@ -17,7 +17,7 @@
             <div class="col-md-6 markdown-panel">
                 <div class="row">
                     <div class="col-md-10">
-                        {{ form.title(id="title", class="editor-blog-title", placeholder=form.title.label.text) }}
+                        {{ form.title(id="title", class="form-control editor-blog-title", placeholder=form.title.label.text) }}
                     </div>
                     <div class="col-md-2">
                         <div class="pull-right" style="margin-top: 4px">
@@ -29,11 +29,11 @@
                     </div>
                 </div>
                 <div>
-                    {{ form.labels(class="editor-blog-area", placeholder=form.labels.label.text) }}
+                    {{ form.labels(class="form-control editor-blog-area", placeholder=form.labels.label.text) }}
                 </div>
 
                 <div>
-                    {{ form.summary(class="editor-blog-area", placeholder=form.summary.label.text, rows=3) }}
+                    {{ form.summary(class="form-control editor-blog-area", placeholder=form.summary.label.text, rows=3) }}
                 </div>
                 <div hidden>
                     {{ form.content(id="content") }}
