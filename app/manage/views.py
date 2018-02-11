@@ -27,7 +27,6 @@ def enable_comment():
     """
     id = request.args.get('id', None)
     disable_enable_comment(id, False)
-    flash('已恢复该条评论')
     return '200'
 
 

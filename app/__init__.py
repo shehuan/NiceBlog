@@ -46,8 +46,6 @@ def create_app(config_name):
     app = Flask(__name__)
     # 导致指定的配置对象
     app.config.from_object(config[config_name])
-    # 调用config.py的init_app()
-    config[config_name].init_app(app)
 
     # 初始化扩展
     bootstrap.init_app(app)

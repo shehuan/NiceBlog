@@ -16,18 +16,15 @@ class Config(object):
 
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
+    # 发送验证的邮箱信息
     MAIL_USERNAME = '544642279@qq.com'
-    MAIL_PASSWORD = 'ssmcaabftlzwbdhf'
+    MAIL_PASSWORD = '授权登录密码'
     MAIL_SERVER = 'smtp.qq.com'
     MAIL_PORT = 465
     # 发件人
     NICEBLOG_MAIL_SENDER = 'NiceBlog<544642279@qq.com>'
     # 邮件主题前缀
     NICEBLOG_MAIL_SUBJECT_PREFIX = '[NiceBlog]'
-
-    @staticmethod
-    def init_app(app):
-        pass
 
 
 # 开发环境的配置
