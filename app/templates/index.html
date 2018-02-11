@@ -7,6 +7,9 @@
 {% block page_content %}
 <div class="row">
     <div class="col-md-7 col-md-offset-1">
+        {% if not blogs %}
+        <h3>还没有文章哦</h3>
+        {% else %}
         {% for blog in blogs %}
         <h3 class="blog-title">
             <a href="{{ url_for('main.blog', id=blog.id) }}" target="_blank">{{ blog.title }}</a>
@@ -40,6 +43,7 @@
             {{ macros.pagination_widget(pagination, 'main.index') }}
             {% endif %}
         </div>
+        {% endif %}
         {% endif %}
     </div>
 
